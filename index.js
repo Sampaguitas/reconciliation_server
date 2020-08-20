@@ -9,19 +9,21 @@ const cors = require('cors');
 const fs = require('fs');
 
 const app = express();
-// var whitelist = ['http://localhost:8080', 'http://localhost:5555', 'https://reconciliation-client.herokuapp.com/']
-// var corsOptions = {
-//     origin: function (origin, callback) {
-//         if (whitelist.indexOf(origin) !== -1) {
-//         callback(null, true)
-//         } else {
-//         callback(new Error('Not allowed by CORS'))
-//         }
-//     }
-// }
-// app.use(cors(corsOptions));
 
-app.use(cors());
+// app.use(cors());
+var whitelist = ['http://localhost:8080', 'http://localhost:5555', 'https://reconciliation-client.herokuapp.com/']
+var corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+        } else {
+        callback(new Error('Not allowed by CORS'))
+        }
+    }
+}
+app.use(cors(corsOptions));
+
+
 //bodyParser middleware
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -44,6 +46,21 @@ mongoose
 // Listen on port
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Server running on ${port}`));
+
+//user
+const userChangePwd = require('./routes/user/changePwd');
+app.put('/user/changePwd', passport.authenticate('jwt', { session: false }), userChangePwd);
+const userDelete = require('./routes/user/delete');
+app.delete('/user/delete', passport.authenticate('jwt', { session: false }), userDelete);
+const userFindAll = require('./routes/user/findAll');
+app.get('/user/findAll', passport.authenticate('jwt', { session: false }), userFindAll);
+const userFindOne = require('./routes/user/findOne');
+app.get('/user/findOne', passport.authenticate('jwt', { session: false }), userFindOne);
+const userCreate = require('./routes/user/create');
+app.post('/user/create', passport.authenticate('jwt', { session: false }), userCreate);
+//open -> login
+//open -> requestPwd
+//open -> resetPwd
 
 // Compile all routers   
 var routeFolders = [],     
