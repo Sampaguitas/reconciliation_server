@@ -23,11 +23,9 @@ var corsOptions = {
 }
 app.use(cors(corsOptions));
 
-
 //bodyParser middleware
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
-
 
 //Passport config file
 app.use(passport.initialize());
