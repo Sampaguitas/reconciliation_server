@@ -9,11 +9,15 @@ router.put('/', (req, res) => {
         data[k] = decodeURI(req.body[k]);
     });
 
-    const id = req.query.id
-    User.findOneAndUpdate({_id: id }, { $set: data }, function (err, user) {
+    let filter = { _id: data.id };
+    let update = { userName: data.userName, name: data.name, email: data.email};
+    let options = { new: true };
+
+    User.findOneAndUpdate(filter, update, options, function (err, user) {
+        console.log('user:', user);
         if (err) {
             return res.status(400).json({ message: 'An error has occured.'});
-        } if (!user) {
+        } else if (!user) {
             return res.status(400).json({ message: 'User could not be updated.'});
         } else {
             return res.status(200).json({ message: 'User has successfully been updated.' });

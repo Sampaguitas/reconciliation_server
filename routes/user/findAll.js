@@ -2,21 +2,36 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');
 
-router.get('/', (req, res) => {
-    var data = {};
-    Object.keys(req.body).forEach(function (k) {
-        data[k] = req.body[k];
-    });
-    User.find(data).sort({name: 'asc'})
-    .exec(function (err, user) {
+router.post('/', (req, res) => {
+    let { sort, filter } = req.body;
+    User
+    .find({
+        userName : { $regex: new RegExp(filter.userName,'i') },
+        name : { $regex: new RegExp(filter.name,'i') },
+        email : { $regex: new RegExp(filter.email,'i') },
+        isAdmin: { $in: filterBool(filter.isAdmin)},
+    })
+    .sort({
+        [!!sort.name ? sort.name : 'name']: sort.isAscending === false ? 1 : -1
+    })
+    .skip(0)
+    .limit(10)
+    .exec(function (err, users) {
         if (err) {
+            console.log(err);
             return res.status(400).json({ message: 'An error has occured.' });
-        } else if (!user) {
-            return res.status(400).json({ message: 'No user could be retrived.' });
         } else {
-            return res.json(user);
+            return res.json({users: users});
         }
     });
 });
 
 module.exports = router;
+
+function filterBool(isAdmin) {
+    switch (isAdmin) {
+        case 'false': return [false];
+        case 'true': return [true];
+        default: return [true, false, undefined];
+    }
+}

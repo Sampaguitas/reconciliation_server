@@ -12,4 +12,5 @@ module.exports = {
     myName: process.env.MY_NAME,
     myPosition: process.env.MY_POSITION,
     myPhone: process.env.MY_PHONE,
+    apiUrl: process.env.API_URL,
 };
