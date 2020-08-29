@@ -56,3 +56,4 @@ app.use('/user/requestPwd', require('./routes/user/requestPwd'));
 app.use('/user/resetPwd', require('./routes/user/resetPwd'));
 app.use('/user/setAdmin', passport.authenticate('jwt', { session: false }), require('./routes/user/setAdmin'));
 app.use('/user/update', passport.authenticate('jwt', { session: false }), require('./routes/user/update'));
+app.use('/user/updatePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/updatePwd'));

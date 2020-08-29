@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const User = require('../../models/User'); //
 const ResetPassword = require('../../models/ResetPassword'); //
-const bcrypt = require('bcrypt');
 
 router.put('/', (req, res) => {
 
