@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ImportDoc = require('../../models/ImportDoc');
+const _ = require('lodash');
 
 router.post('/', (req, res) => {
     let { sort, filter, pageSize } = req.body;
@@ -28,11 +29,17 @@ router.post('/', (req, res) => {
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
+                let sliced = importDocs.slice(0, pageSize -1);
+                let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
+                let lastItem = !_.isEmpty(sliced) ? firstItem + sliced.length - 1 : 0;
                 return res.json({
-                    importDocs: importDocs.slice(0, pageSize -1),
+                    importDocs: sliced,
                     currentPage: nextPage,
-                    totalItems: importDocs.length,
+                    firstItem: firstItem,
+                    lastItem: lastItem,
+                    pageItems: sliced.length,
                     pageLast: pageLast,
+                    totalItems: importDocs.length,
                     first: nextPage < 4 ? 1 : (nextPage === pageLast) ? nextPage - 2 : nextPage - 1,
                     second: nextPage < 4 ? 2 : (nextPage === pageLast) ? nextPage - 1 : nextPage,
                     third: nextPage < 4 ? 3 : (nextPage === pageLast) ? nextPage : nextPage + 1,

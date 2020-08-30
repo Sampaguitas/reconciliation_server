@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');
+const _ = require('lodash');
 
 router.post('/', (req, res) => {
     let { sort, filter, pageSize } = req.body;
@@ -25,11 +26,17 @@ router.post('/', (req, res) => {
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
                 let pageLast = Math.ceil(users.length / pageSize) || 1;
+                let sliced = users.slice(0, pageSize -1);
+                let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
+                let lastItem = !_.isEmpty(sliced) ? firstItem + sliced.length - 1 : 0;
                 return res.json({
-                    users: users.slice(0, pageSize -1),
+                    users: sliced,
                     currentPage: nextPage,
-                    totalItems: users.length,
+                    firstItem: firstItem,
+                    lastItem: lastItem,
+                    pageItems: sliced.length,
                     pageLast: pageLast,
+                    totalItems: users.length,
                     first: nextPage < 4 ? 1 : (nextPage === pageLast) ? nextPage - 2 : nextPage - 1,
                     second: nextPage < 4 ? 2 : (nextPage === pageLast) ? nextPage - 1 : nextPage,
                     third: nextPage < 4 ? 3 : (nextPage === pageLast) ? nextPage : nextPage + 1,
