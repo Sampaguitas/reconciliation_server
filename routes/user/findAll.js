@@ -5,8 +5,6 @@ const User = require('../../models/User');
 router.post('/', (req, res) => {
     let { sort, filter, pageSize } = req.body;
     let nextPage = req.body.nextPage || 1;
-    console.log('nextPage:', nextPage);
-    console.log('pageSize:', pageSize);
     if (!pageSize) {
         res.status(400).json({message: 'pageSize should be greater than 0.'});
     } else {
@@ -24,14 +22,17 @@ router.post('/', (req, res) => {
         // .limit(pageSize)
         .exec(function (err, users) {
             if (err) {
-                console.log(err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
+                let pageLast = Math.ceil(users.length / pageSize);
                 return res.json({
                     users: users.slice(0, pageSize -1),
                     currentPage: nextPage,
                     totalItems: users.length,
-                    pageLast: Math.ceil(users.length / pageSize)
+                    pageLast: pageLast,
+                    first: nextPage < 4 ? 1 : (nextPage === pageLast) ? nextPage - 2 : nextPage - 1,
+                    second: nextPage < 4 ? 2 : (nextPage === pageLast) ? nextPage - 1 : nextPage,
+                    third: nextPage < 4 ? 3 : (nextPage === pageLast) ? nextPage : nextPage + 1,
                 });
             }
         });
