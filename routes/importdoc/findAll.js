@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../../models/User');
+const ImportDoc = require('../../models/ImportDoc');
 
 router.post('/', (req, res) => {
     let { sort, filter, pageSize } = req.body;
@@ -8,27 +8,30 @@ router.post('/', (req, res) => {
     if (!pageSize) {
         res.status(400).json({message: 'pageSize should be greater than 0.'});
     } else {
-        User
+        ImportDoc
         .find({
-            userName : { $regex: new RegExp(filter.userName,'i') },
-            name : { $regex: new RegExp(filter.name,'i') },
-            email : { $regex: new RegExp(filter.email,'i') },
-            isAdmin: { $in: filterBool(filter.isAdmin)},
+            decNr : { $regex: new RegExp(filter.decNr,'i') },
+            boeNr : { $regex: new RegExp(filter.boeNr,'i') },
+            // boeDate : { $regex: new RegExp(filter.boeDate,'i') },
+            // decDate : { $regex: new RegExp(filter.decDate,'i') },
+            // grossWeight : { $regex: new RegExp(filter.grossWeight,'i') },
+            // totPrice : { $regex: new RegExp(filter.totPrice,'i') },
+            status : { $regex: new RegExp(filter.status,'i') },
         })
         .sort({
-            [!!sort.name ? sort.name : 'name']: sort.isAscending === false ? 1 : -1
+            [!!sort.name ? sort.name : 'decNr']: sort.isAscending === false ? 1 : -1
         })
         .skip((nextPage - 1) * pageSize)
         // .limit(pageSize)
-        .exec(function (err, users) {
+        .exec(function (err, importDocs) {
             if (err) {
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
-                let pageLast = Math.ceil(users.length / pageSize) || 1;
+                let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
                 return res.json({
-                    users: users.slice(0, pageSize -1),
+                    importDocs: importDocs.slice(0, pageSize -1),
                     currentPage: nextPage,
-                    totalItems: users.length,
+                    totalItems: importDocs.length,
                     pageLast: pageLast,
                     first: nextPage < 4 ? 1 : (nextPage === pageLast) ? nextPage - 2 : nextPage - 1,
                     second: nextPage < 4 ? 2 : (nextPage === pageLast) ? nextPage - 1 : nextPage,
@@ -36,15 +39,7 @@ router.post('/', (req, res) => {
                 });
             }
         });
-    } 
+    }
 });
 
 module.exports = router;
-
-function filterBool(isAdmin) {
-    switch (isAdmin) {
-        case 'false': return [false];
-        case 'true': return [true];
-        default: return [true, false, undefined];
-    }
-}
