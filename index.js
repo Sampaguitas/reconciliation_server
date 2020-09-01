@@ -59,3 +59,4 @@ app.use('/user/update', passport.authenticate('jwt', { session: false }), requir
 app.use('/user/updatePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/updatePwd'));
 //importdoc
 app.use('/importdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findAll'));
+app.use('/importdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/create'));

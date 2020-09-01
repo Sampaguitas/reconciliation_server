@@ -20,16 +20,17 @@ const ImportDocSchema = new Schema({
         required: true,
     },
     grossWeight:{
-        type: Date,
+        type: Number,
         required: true,
     },
     totPrice: {
-        type: Date,
+        type: Number,
         required: true,
     },
-    status: {
-        type: String,
-        required: false
+    isCloded: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 

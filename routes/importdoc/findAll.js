@@ -9,25 +9,46 @@ router.post('/', (req, res) => {
     if (!pageSize) {
         res.status(400).json({message: 'pageSize should be greater than 0.'});
     } else {
+        
         ImportDoc
-        .find({
-            decNr : { $regex: new RegExp(filter.decNr,'i') },
-            boeNr : { $regex: new RegExp(filter.boeNr,'i') },
-            // boeDate : { $regex: new RegExp(filter.boeDate,'i') },
-            // decDate : { $regex: new RegExp(filter.decDate,'i') },
-            // grossWeight : { $regex: new RegExp(filter.grossWeight,'i') },
-            // totPrice : { $regex: new RegExp(filter.totPrice,'i') },
-            status : { $regex: new RegExp(filter.status,'i') },
-        })
+        .aggregate([
+            {
+                $addFields: {
+                    boeDateX: { $dateToString: { format: "%d-%m-%Y", date: "$boeDate" } },
+                    decDateX: { $dateToString: { format: "%d-%m-%Y", date: "$decDate" } },
+                    // grossWeightX: { $toString: "$grossWeight" },
+                    // totPriceX: { $toString: "$totPrice" },
+                }
+            },
+            {
+                $match: {
+                    decNr : { $regex: new RegExp(filter.decNr,'i') },
+                    boeNr : { $regex: new RegExp(filter.boeNr,'i') },
+                    boeDateX : { $regex: new RegExp(filter.boeDate,'i') },
+                    decDateX : { $regex: new RegExp(filter.decDate,'i') },
+                }
+            },
+        ])
+        // .find({
+        //     decNr : { $regex: new RegExp(filter.decNr,'i') },
+        //     boeNr : { $regex: new RegExp(filter.boeNr,'i') },
+        //     // boeDate : { $regex: new RegExp(filter.boeDate,'i') },
+        //     // decDate : { $regex: new RegExp(filter.decDate,'i') },
+        //     // grossWeight : { $regex: new RegExp(filter.grossWeight,'i') },
+        //     // totPrice : { $regex: new RegExp(filter.totPrice,'i') },
+        //     isClosed : { $in: filterBool(filter.isAdmin)},
+        // })
         .sort({
             [!!sort.name ? sort.name : 'decNr']: sort.isAscending === false ? 1 : -1
         })
         .skip((nextPage - 1) * pageSize)
-        // .limit(pageSize)
+        // // .limit(pageSize)
         .exec(function (err, importDocs) {
             if (err) {
+                console.log('err:', err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
+                console.log('importDocs:', importDocs);
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
                 let sliced = importDocs.slice(0, pageSize -1);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
@@ -50,3 +71,11 @@ router.post('/', (req, res) => {
 });
 
 module.exports = router;
+
+function filterBool(isAdmin) {
+    switch (isAdmin) {
+        case 'false': return [false];
+        case 'true': return [true];
+        default: return [true, false, undefined];
+    }
+}
