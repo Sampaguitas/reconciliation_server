@@ -27,9 +27,8 @@ const ImportDocSchema = new Schema({
         type: Number,
         required: true,
     },
-    isCloded: {
+    isClosed: {
         type: Boolean,
-        required: false,
         default: false
     }
 });
