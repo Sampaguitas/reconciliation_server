@@ -29,7 +29,7 @@ router.post('/', (req, res) => {
                     decDateX : { $regex: new RegExp(escape(filter.decDate),'i') },
                     grossWeightX: { $regex: new RegExp(escape(filter.grossWeight),'i') },
                     totPriceX: { $regex: new RegExp(escape(filter.totPrice),'i') },
-                    isClosed : { $in: isClosed(filter.isClosed)},
+                    isClosed : { $in: filterBool(filter.isClosed)},
                 }
             }
         ])
@@ -67,8 +67,8 @@ router.post('/', (req, res) => {
 
 module.exports = router;
 
-function isClosed(myBool) {
-    switch (myBool) {
+function filterBool(element) {
+    switch (element) {
         case 'false': return [false];
         case 'true': return [true];
         default: return [true, false, undefined];

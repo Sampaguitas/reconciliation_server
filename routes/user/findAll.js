@@ -11,9 +11,9 @@ router.post('/', (req, res) => {
     } else {
         User
         .find({
-            userName : { $regex: new RegExp(filter.userName,'i') },
-            name : { $regex: new RegExp(filter.name,'i') },
-            email : { $regex: new RegExp(filter.email,'i') },
+            userName : { $regex: new RegExp(escape(filter.userName),'i') },
+            name : { $regex: new RegExp(escape(filter.name),'i') },
+            email : { $regex: new RegExp(escape(filter.email),'i') },
             isAdmin: { $in: filterBool(filter.isAdmin)},
         })
         .sort({
@@ -48,10 +48,14 @@ router.post('/', (req, res) => {
 
 module.exports = router;
 
-function filterBool(isAdmin) {
-    switch (isAdmin) {
+function filterBool(element) {
+    switch (element) {
         case 'false': return [false];
         case 'true': return [true];
         default: return [true, false, undefined];
     }
+}
+
+function escape(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
