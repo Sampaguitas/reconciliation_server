@@ -17,8 +17,8 @@ router.post('/', (req, res) => {
                 $addFields: {
                     boeDateX: { $dateToString: { format, date: "$boeDate" } },
                     decDateX: { $dateToString: { format, date: "$decDate" } },
-                    grossWeightX: { $substrBytes: [ "$grossWeight", 0, 10 ]  },
-                    totPriceX: { $substrBytes: [ "$totPrice", 0, 10 ]  },
+                    grossWeightX: { $toString: "$grossWeight" },
+                    totPriceX: { $toString: "$totPrice" },
                 }
             },
             {
@@ -36,14 +36,11 @@ router.post('/', (req, res) => {
         .sort({
             [!!sort.name ? sort.name : 'decNr']: sort.isAscending === false ? 1 : -1
         })
-        // .skip((nextPage - 1) * pageSize)
-        // // .limit(pageSize)
         .exec(function (err, importDocs) {
             if (err) {
-                // console.log('err:', err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
-                // console.log(importDocs);
+                console.log(importDocs);
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
                 let sliced = importDocs.slice((nextPage - 1) * pageSize, pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
