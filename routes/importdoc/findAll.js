@@ -40,10 +40,10 @@ router.post('/', (req, res) => {
         // // .limit(pageSize)
         .exec(function (err, importDocs) {
             if (err) {
-                console.log('err:', err);
+                // console.log('err:', err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
-                console.log(importDocs);
+                // console.log(importDocs);
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
                 let sliced = importDocs.slice((nextPage - 1) * pageSize, pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
