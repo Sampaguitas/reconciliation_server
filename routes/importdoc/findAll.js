@@ -4,9 +4,10 @@ const ImportDoc = require('../../models/ImportDoc');
 const _ = require('lodash');
 
 router.post('/', (req, res) => {
-    let { sort, filter, pageSize } = req.body;
+    let { sort, filter, pageSize, dateFormat } = req.body;
     let nextPage = req.body.nextPage || 1;
-    console.log(filter.isClosed);
+    let format = dateFormat.replace('DD', '%d').replace('MM', '%m').replace('YYYY', '%Y');
+
     if (!pageSize) {
         res.status(400).json({message: 'pageSize should be greater than 0.'});
     } else {
@@ -14,41 +15,37 @@ router.post('/', (req, res) => {
         .aggregate([
             {
                 $addFields: {
-                    boeDateX: { $dateToString: { format: "%d-%m-%Y", date: "$boeDate" } },
-                    decDateX: { $dateToString: { format: "%d-%m-%Y", date: "$decDate" } },
+                    boeDateX: { $dateToString: { format, date: "$boeDate" } },
+                    decDateX: { $dateToString: { format, date: "$decDate" } },
+                    grossWeightX: { $substrBytes: [ "$grossWeight", 0, 10 ]  },
+                    totPriceX: { $substrBytes: [ "$totPrice", 0, 10 ]  },
                 }
             },
             {
                 $match: {
-                    decNr : { $regex: new RegExp(filter.decNr,'i') },
-                    boeNr : { $regex: new RegExp(filter.boeNr,'i') },
-                    boeDateX : { $regex: new RegExp(filter.boeDate,'i') },
-                    decDateX : { $regex: new RegExp(filter.decDate,'i') },
+                    decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
+                    boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
+                    boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
+                    decDateX : { $regex: new RegExp(escape(filter.decDate),'i') },
+                    grossWeightX: { $regex: new RegExp(escape(filter.grossWeight),'i') },
+                    totPriceX: { $regex: new RegExp(escape(filter.totPrice),'i') },
                     isClosed : { $in: isClosed(filter.isClosed)},
                 }
             }
         ])
-        // .find({
-        //     decNr : { $regex: new RegExp(filter.decNr,'i') },
-        //     boeNr : { $regex: new RegExp(filter.boeNr,'i') },
-        //     // boeDate : { $regex: new RegExp(filter.boeDate,'i') },
-        //     // decDate : { $regex: new RegExp(filter.decDate,'i') },
-        //     // grossWeight : { $regex: new RegExp(filter.grossWeight,'i') },
-        //     // totPrice : { $regex: new RegExp(filter.totPrice,'i') },
-        //     isClosed : { $in: isClosed(filter.isAdmin)},
-        // })
         .sort({
             [!!sort.name ? sort.name : 'decNr']: sort.isAscending === false ? 1 : -1
         })
-        .skip((nextPage - 1) * pageSize)
+        // .skip((nextPage - 1) * pageSize)
         // // .limit(pageSize)
         .exec(function (err, importDocs) {
             if (err) {
                 console.log('err:', err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
+                console.log(importDocs);
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
-                let sliced = importDocs.slice(0, pageSize -1);
+                let sliced = importDocs.slice((nextPage - 1) * pageSize, pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
                 let lastItem = !_.isEmpty(sliced) ? firstItem + sliced.length - 1 : 0;
                 return res.json({
@@ -76,4 +73,8 @@ function isClosed(myBool) {
         case 'true': return [true];
         default: return [true, false, undefined];
     }
+}
+
+function escape(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
