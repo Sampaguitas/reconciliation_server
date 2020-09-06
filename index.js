@@ -60,6 +60,7 @@ app.use('/user/updatePwd', passport.authenticate('jwt', { session: false }), req
 //importdoc
 app.use('/importdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findAll'));
 app.use('/importdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/create'));
+app.use('/importdoc/getItems', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/getItems'));
 //exportdoc
 app.use('/exportdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findAll'));
 app.use('/exportdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/create'));

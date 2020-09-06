@@ -26,7 +26,16 @@ const ImportDocSchema = new Schema({
     isClosed: {
         type: Boolean,
         default: false
-    }
+    },
 });
+
+ImportDocSchema.virtual("items", {
+    ref: "importitems",
+    localField: "_id",
+    foreignField: "documentId",
+    justOne: false
+});
+
+ImportDocSchema.set('toJSON', { virtuals: true });
 
 module.exports= ImportDoc = mongoose.model('importdocs', ImportDocSchema);
