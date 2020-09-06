@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ImportDoc = require('../../models/ImportDoc');
+const ExportDoc = require('../../models/ExportDoc');
 const _ = require('lodash');
 
 router.post('/', (req, res) => {
@@ -11,7 +11,7 @@ router.post('/', (req, res) => {
     if (!pageSize) {
         res.status(400).json({message: 'pageSize should be greater than 0.'});
     } else {
-        ImportDoc
+        ExportDoc
         .aggregate([
             {
                 $addFields: {
@@ -22,6 +22,7 @@ router.post('/', (req, res) => {
             },
             {
                 $match: {
+                    invNr : { $regex: new RegExp(escape(filter.invNr),'i') },
                     decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
                     boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
                     boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },

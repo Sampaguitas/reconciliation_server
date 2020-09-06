@@ -2,18 +2,22 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const _ = require('lodash');
 
-const ImportDocSchema = new Schema({
-    decNr: {
+const ExportDocSchema = new Schema({
+    invNr: {
         type: String,
         required: true
+    },
+    decNr: {
+        type: String,
+        required: false
     },
     boeNr: {
         type: String,
-        required: true
+        required: false
     },
     boeDate: {
         type: Date,
-        required: true
+        required: false
     },
     grossWeight:{
         type: Number,
@@ -29,4 +33,4 @@ const ImportDocSchema = new Schema({
     }
 });
 
-module.exports= ImportDoc = mongoose.model('importdocs', ImportDocSchema);
+module.exports= ExportDoc = mongoose.model('exportdocs', ExportDocSchema);
