@@ -9,9 +9,9 @@ router.post('/', (req, res) => {
     if (!invNr ) {
         return res.status(400).json({ message: 'Invoice number are required.' });
     } else {
-        let conditions =  {invNr};
+        let conditions =  { invNr };
         let update = { decNr, boeNr, boeDate, grossWeight, totPrice };
-        let options = {new: true, upsert: true};
+        let options = { new: true, upsert: true };
         
         ExportDoc.findOneAndUpdate(conditions, update, options , function (errDoc, resDoc) {
             if (errDoc || !resDoc) {

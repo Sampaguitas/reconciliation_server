@@ -28,7 +28,6 @@ router.post('/', (req, res) => {
                     boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
                     grossWeightX: { $regex: new RegExp(escape(filter.grossWeight),'i') },
                     totPriceX: { $regex: new RegExp(escape(filter.totPrice),'i') },
-                    isClosed : { $in: filterBool(filter.isClosed)},
                 }
             }
         ])
@@ -61,14 +60,6 @@ router.post('/', (req, res) => {
 });
 
 module.exports = router;
-
-function filterBool(element) {
-    switch (element) {
-        case 'false': return [false];
-        case 'true': return [true];
-        default: return [true, false, undefined];
-    }
-}
 
 function escape(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

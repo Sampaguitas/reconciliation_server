@@ -9,7 +9,7 @@ router.post('/', (req, res) => {
     if (!decNr || !decNr ) {
         return res.status(400).json({ message: 'DEC and BOE numbers are required.' });
     } else {
-        let conditions =  {decNr, boeNr};
+        let conditions =  { decNr, boeNr };
         let update = { boeDate, grossWeight, totPrice };
         let options = {new: true, upsert: true};
         

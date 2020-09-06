@@ -26,10 +26,6 @@ const ExportDocSchema = new Schema({
     totPrice: {
         type: Number,
         required: true,
-    },
-    isClosed: {
-        type: Boolean,
-        default: false
     }
 });
 
