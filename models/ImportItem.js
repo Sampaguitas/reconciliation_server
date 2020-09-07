@@ -24,7 +24,7 @@ const ImportItemSchema = new Schema({
         required: true
     },
     hsCode: {
-        type: Number,
+        type: String,
         required: true
     },
     country: {
@@ -36,5 +36,19 @@ const ImportItemSchema = new Schema({
         required: true
     }
 });
+
+ImportItemSchema.virtual("srNrX").get(function() {
+    return this.srNr.toString();
+});
+
+ImportItemSchema.virtual("unitWeightX").get(function() {
+    return this.unitWeight.toString();
+});
+
+ImportItemSchema.virtual("unitPriceX").get(function() {
+    return this.unitPrice.toString();
+});
+
+ImportItemSchema.set('toJSON', { virtuals: true });
 
 module.exports= ImportItem = mongoose.model('importitems', ImportItemSchema);

@@ -26,7 +26,6 @@ router.post('/', (req, res) => {
                     boeDateX: { $dateToString: { format, date: "$boeDate" } },
                     grossWeightX: { $toString: "$grossWeight" },
                     totPriceX: { $toString: "$totPrice" },
-                    // balWeight: { $push: "$items.invNr" },
                     "invNrs": {
                         $reduce: {
                             input: "$items",
@@ -71,7 +70,21 @@ router.post('/', (req, res) => {
             },
             {
                 $project: {
-                    decNr: 1, boeNr: 1, boeDate: 1, grossWeight: 1, totPrice: 1, invNrs: 1, isClosed: 1
+                    decNr: 1,
+                    boeNr: 1,
+                    boeDate: 1,
+                    grossWeight: 1,
+                    totPrice: 1,
+                    invNrs: 1,
+                    status: { 
+                        $cond: {
+                            if: { 
+                                $eq: ["$isClosed", true]
+                            },
+                            then: "Closed",
+                            else: "Open"
+                        }
+                    }
                 }
             }
         ])
@@ -80,10 +93,8 @@ router.post('/', (req, res) => {
         })
         .exec(function (err, importDocs) {
             if (err) {
-                // console.log(err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
-                // console.log(importDocs);
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
                 let sliced = importDocs.slice((nextPage - 1) * pageSize, pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
