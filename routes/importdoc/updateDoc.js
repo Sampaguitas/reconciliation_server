@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const ImportItem = require('../../models/ImportItem');
+const ImportDoc = require('../../models/ImportDoc');
 
 router.put('/', (req, res) => {
-    const { _id, decNr, boeNr, boeDate, grossWeight, totPrice}
-    if (!req.body._id) {
-        return res.status(400).json({ message: 'importitemId is required.'});
+    const { _id, decNr, boeNr, boeDate, grossWeight, totPrice} = req.body;
+    if (!_id) {
+        return res.status(400).json({ message: 'importdocId is required.'});
     } else {
         let filter = { _id };
         let update = { decNr, boeNr, boeDate, grossWeight, totPrice};
         let options = { new: true };
     
-        ImportItem.findOneAndUpdate(filter, update, options, function (err, importitem) {
-            console.log('importitem:', importitem);
+        ImportDoc.findOneAndUpdate(filter, update, options, function (err, importdoc) {
             if (err) {
+                console.log(err);
                 return res.status(400).json({ message: 'An error has occured.'});
-            } else if (!importitem) {
+            } else if (!importdoc) {
                 return res.status(400).json({ message: 'Item could not be updated.'});
             } else {
                 return res.status(200).json({ message: 'Item has successfully been updated.' });

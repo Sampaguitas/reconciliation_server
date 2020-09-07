@@ -60,6 +60,7 @@ app.use('/user/updatePwd', passport.authenticate('jwt', { session: false }), req
 //importdoc
 app.use('/importdoc/getDocs', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/getDocs'));
 app.use('/importdoc/createDoc', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/createDoc'));
+app.use('/importdoc/updateDoc', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/updateDoc'));
 app.use('/importdoc/getItems', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/getItems'));
 app.use('/importdoc/createItem', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/createItem'));
 //exportdoc
