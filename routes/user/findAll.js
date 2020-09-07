@@ -57,5 +57,9 @@ function filterBool(element) {
 }
 
 function escape(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (!_.isUndefined(string)) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    } else {
+        return '';
+    }
 }

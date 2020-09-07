@@ -14,20 +14,64 @@ router.post('/', (req, res) => {
         ImportDoc
         .aggregate([
             {
+                $lookup: {
+                    from: "importitems",
+                    localField: "_id",
+                    foreignField: "documentId",
+                    as: "items",
+                },
+            },
+            {
                 $addFields: {
                     boeDateX: { $dateToString: { format, date: "$boeDate" } },
                     grossWeightX: { $toString: "$grossWeight" },
                     totPriceX: { $toString: "$totPrice" },
+                    // balWeight: { $push: "$items.invNr" },
+                    "invNrs": {
+                        $reduce: {
+                            input: "$items",
+                            initialValue: "",
+                            in: { 
+                                $concat: [
+                                    "$$value",
+                                    {
+                                        $cond: {
+                                            if: {
+                                                $indexOfCP: ["$$value", "$$this.invNr"]
+                                            },
+                                            then: { 
+                                                $cond: {
+                                                    if: {
+                                                        $eq: ["$$value", ""]
+                                                    },
+                                                    then: "$$this.invNr",
+                                                    else: " | $$this.invNr",
+                                                }, 
+                                            }, 
+                                            else : ""
+                                        }
+                                    },
+                                ]
+                            }
+                        }
+                    },
+                    
                 }
             },
             {
                 $match: {
                     decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
                     boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
+                    invNrs: { $regex: new RegExp(escape(filter.invNrs),'i') },
                     boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
                     grossWeightX: { $regex: new RegExp(escape(filter.grossWeight),'i') },
                     totPriceX: { $regex: new RegExp(escape(filter.totPrice),'i') },
                     isClosed : { $in: filterBool(filter.isClosed)},
+                }
+            },
+            {
+                $project: {
+                    decNr: 1, boeNr: 1, boeDate: 1, grossWeight: 1, totPrice: 1, invNrs: 1, isClosed: 1
                 }
             }
         ])
@@ -36,8 +80,10 @@ router.post('/', (req, res) => {
         })
         .exec(function (err, importDocs) {
             if (err) {
+                // console.log(err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
+                // console.log(importDocs);
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
                 let sliced = importDocs.slice((nextPage - 1) * pageSize, pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
