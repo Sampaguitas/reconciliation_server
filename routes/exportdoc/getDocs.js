@@ -39,7 +39,7 @@ router.post('/', (req, res) => {
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
                 let pageLast = Math.ceil(importDocs.length / pageSize) || 1;
-                let sliced = importDocs.slice((nextPage - 1) * pageSize, pageSize);
+                let sliced = importDocs.slice((nextPage - 1) * pageSize, ((nextPage - 1) * pageSize) + pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
                 let lastItem = !_.isEmpty(sliced) ? firstItem + sliced.length - 1 : 0;
                 return res.json({

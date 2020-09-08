@@ -52,7 +52,7 @@ router.post('/', (req, res) => {
                     return acc;
                 }, []);
                 let pageLast = Math.ceil(filtered.length / pageSize) || 1;
-                let sliced = filtered.slice((nextPage - 1) * pageSize, pageSize);
+                let sliced = filtered.slice((nextPage - 1) * pageSize, ((nextPage - 1) * pageSize) + pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;
                 let lastItem = !_.isEmpty(sliced) ? firstItem + sliced.length - 1 : 0;
                 return res.json({
