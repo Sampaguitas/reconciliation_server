@@ -10,18 +10,18 @@ const fs = require('fs');
 
 const app = express();
 
-app.use(cors());
-// var whitelist = ['http://localhost:8080', 'http://localhost:5555', 'https://reconciliation-client.herokuapp.com']
-// var corsOptions = {
-//     origin: function (origin, callback) {
-//         if (whitelist.indexOf(origin) !== -1) {
-//         callback(null, true)
-//         } else {
-//         callback(new Error('Not allowed by CORS'))
-//         }
-//     }
-// }
-// app.use(cors(corsOptions));
+// app.use(cors());
+var whitelist = ['http://localhost:8080', 'http://localhost:5555', 'https://reconciliation-client.herokuapp.com']
+var corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+        } else {
+        callback(new Error('Not allowed by CORS'))
+        }
+    }
+}
+app.use(cors(corsOptions));
 
 //bodyParser middleware
 app.use(bodyParser.urlencoded({extended:false}));
@@ -56,6 +56,7 @@ app.use('/importdoc/update', passport.authenticate('jwt', { session: false }), r
 //importitem
 app.use('/importitem/create', passport.authenticate('jwt', { session: false }), require('./routes/importitem/create'));
 app.use('/importitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/importitem/delete'));
+app.use('/importitem/update', passport.authenticate('jwt', { session: false }), require('./routes/importitem/update'));
 //user
 app.use('/user/changePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/changePwd'));
 app.use('/user/create', passport.authenticate('jwt', { session: false }), require('./routes/user/create'));
