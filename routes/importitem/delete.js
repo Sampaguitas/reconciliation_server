@@ -27,7 +27,7 @@ router.delete('/', async (req, res) => {
 });
 
 function removeItem(selectedId) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
         ImportItem.findByIdAndDelete(selectedId, function (err) {
             if (err) {
                 resolve({

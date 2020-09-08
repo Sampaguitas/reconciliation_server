@@ -23,14 +23,15 @@ router.post('/', (req, res) => {
             },
             options: {
                 sort: {
-                    [!!sort.name ? sort.name : 'srNr']: sort.isAscending === false ? 1 : -1
+                    [!!sort.name ? sort.name : 'srNr']: sort.isAscending === false ? -1 : 1
                 }
             }
         })
         .exec(function (err, importDoc) {
             if (err) {
-                console.log(err);
-                return res.status(400).json({ message: 'An error has occured.' });
+                return res.status(500).json({ message: 'Internal server error.'});
+            } else if (!importDoc) {
+                return res.status(404).json({ message: 'Document not found.'});
             } else {
                 let regSrNr = new RegExp(escape(filter.srNr),'i');
                 let regWeigth = new RegExp(escape(filter.unitWeight), 'i');

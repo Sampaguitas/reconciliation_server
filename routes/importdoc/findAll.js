@@ -89,7 +89,7 @@ router.post('/', (req, res) => {
             }
         ])
         .sort({
-            [!!sort.name ? sort.name : 'decNr']: sort.isAscending === false ? 1 : -1
+            [!!sort.name ? sort.name : 'decNr']: sort.isAscending === false ? -1 : 1
         })
         .exec(function (err, importDocs) {
             if (err) {

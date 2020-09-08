@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
             isAdmin: { $in: filterBool(filter.isAdmin)},
         })
         .sort({
-            [!!sort.name ? sort.name : 'name']: sort.isAscending === false ? 1 : -1
+            [!!sort.name ? sort.name : 'name']: sort.isAscending === false ? -1 : 1
         })
         // .skip((nextPage - 1) * pageSize)
         // .limit(pageSize)
