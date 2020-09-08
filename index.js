@@ -45,6 +45,17 @@ mongoose
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Server running on ${port}`));
 
+//exportdoc
+app.use('/exportdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/create'));
+app.use('/exportdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findAll'));
+//importdoc
+app.use('/importdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/create'));
+app.use('/importdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findAll'));
+app.use('/importdoc/findOne', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findOne'));
+app.use('/importdoc/update', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/update'));
+//importitem
+app.use('/importitem/create', passport.authenticate('jwt', { session: false }), require('./routes/importitem/create'));
+app.use('/importitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/importitem/delete'));
 //user
 app.use('/user/changePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/changePwd'));
 app.use('/user/create', passport.authenticate('jwt', { session: false }), require('./routes/user/create'));
@@ -57,12 +68,3 @@ app.use('/user/resetPwd', require('./routes/user/resetPwd'));
 app.use('/user/setAdmin', passport.authenticate('jwt', { session: false }), require('./routes/user/setAdmin'));
 app.use('/user/update', passport.authenticate('jwt', { session: false }), require('./routes/user/update'));
 app.use('/user/updatePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/updatePwd'));
-//importdoc
-app.use('/importdoc/getDocs', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/getDocs'));
-app.use('/importdoc/createDoc', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/createDoc'));
-app.use('/importdoc/updateDoc', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/updateDoc'));
-app.use('/importdoc/getItems', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/getItems'));
-app.use('/importdoc/createItem', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/createItem'));
-//exportdoc
-app.use('/exportdoc/getDocs', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/getDocs'));
-app.use('/exportdoc/createDoc', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/createDoc'));
