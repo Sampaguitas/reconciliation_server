@@ -17,6 +17,7 @@ router.post('/', (req, res) => {
             path: 'items',
             match: {
                 desc : { $regex: new RegExp(escape(filter.desc),'i') },
+                poNr : { $regex: new RegExp(escape(filter.poNr),'i') },
                 invNr : { $regex: new RegExp(escape(filter.invNr),'i') },
                 country : { $regex: new RegExp(escape(filter.country),'i') },
                 hsCode : { $regex: new RegExp(escape(filter.hsCode),'i') },
@@ -55,6 +56,7 @@ router.post('/', (req, res) => {
                             qty: cur.qty,
                             srNr: cur.srNr,
                             desc: cur.desc,
+                            poNr: cur.poNr,
                             invNr: cur.invNr,
                             unitWeight: cur.unitWeight,
                             totWeight: cur.totWeight,
@@ -100,5 +102,5 @@ router.post('/', (req, res) => {
 module.exports = router;
 
 function escape(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return !_.isUndefined(string) ? string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
 }

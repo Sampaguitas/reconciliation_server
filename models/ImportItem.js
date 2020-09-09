@@ -15,6 +15,10 @@ const ImportItemSchema = new Schema({
         type: String,
         required: true
     },
+    poNr: {
+        type: String,
+        required: true
+    },
     invNr: {
         type: String,
         required: true
@@ -23,7 +27,15 @@ const ImportItemSchema = new Schema({
         type: Number,
         required: true
     },
+    totWeight: {
+        type: Number,
+        required: true
+    },
     unitPrice: {
+        type: Number,
+        required: true
+    },
+    totPrice: {
         type: Number,
         required: true
     },
@@ -41,38 +53,28 @@ const ImportItemSchema = new Schema({
     }
 });
 
-ImportItemSchema.virtual("totWeight").get(function() {
-    return (this.unitWeight * this.qty) || 0;
-});
-
-ImportItemSchema.virtual("totPrice").get(function() {
-    return (this.unitPrice * this.qty) || 0;
-});
-
 ImportItemSchema.virtual("srNrX").get(function() {
-    return this.srNr.toString();
+    return !_.isUndefined(this.srNr) ? this.srNr.toString() : "";
 });
 
 ImportItemSchema.virtual("qtyX").get(function() {
-    return this.qty.toString();
+    return !_.isUndefined(this.qty) ? this.qty.toString() : "";
 });
 
 ImportItemSchema.virtual("unitWeightX").get(function() {
-    return this.unitWeight.toString();
+    return !_.isUndefined(this.unitWeight) ? this.unitWeight.toString() : "";
 });
 
 ImportItemSchema.virtual("totWeightX").get(function() {
-    let totWeight = (this.unitWeight * this.qty) || 0
-    return totWeight.toString();
+    return !_.isUndefined(this.totWeight) ? this.totWeight.toString() : "";
 });
 
 ImportItemSchema.virtual("unitPriceX").get(function() {
-    return this.unitPrice.toString();
+    return !_.isUndefined(this.unitPrice) ? this.unitPrice.toString() : "";
 });
 
 ImportItemSchema.virtual("totPriceX").get(function() {
-    let totPrice = (this.unitPrice * this.qty) || 0
-    return totPrice.toString();
+    return !_.isUndefined(this.totPrice) ? this.totPrice.toString() : "";
 });
 
 ImportItemSchema.set('toJSON', { virtuals: true });

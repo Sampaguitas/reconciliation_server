@@ -26,6 +26,34 @@ router.post('/', (req, res) => {
                     boeDateX: { $dateToString: { format, date: "$boeDate" } },
                     grossWeightX: { $toString: "$grossWeight" },
                     totPriceX: { $toString: "$totPrice" },
+                    "poNrs": {
+                        $reduce: {
+                            input: "$items",
+                            initialValue: "",
+                            in: { 
+                                $concat: [
+                                    "$$value",
+                                    {
+                                        $cond: {
+                                            if: {
+                                                $indexOfCP: ["$$value", "$$this.poNr"]
+                                            },
+                                            then: { 
+                                                $cond: {
+                                                    if: {
+                                                        $eq: ["$$value", ""]
+                                                    },
+                                                    then: "$$this.poNr",
+                                                    else: " | $$this.poNr",
+                                                }, 
+                                            }, 
+                                            else : ""
+                                        }
+                                    },
+                                ]
+                            }
+                        }
+                    },
                     "invNrs": {
                         $reduce: {
                             input: "$items",
@@ -61,6 +89,7 @@ router.post('/', (req, res) => {
                 $match: {
                     decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
                     boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
+                    poNrs: { $regex: new RegExp(escape(filter.poNrs),'i') },
                     invNrs: { $regex: new RegExp(escape(filter.invNrs),'i') },
                     boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
                     grossWeightX: { $regex: new RegExp(escape(filter.grossWeight),'i') },
@@ -75,6 +104,7 @@ router.post('/', (req, res) => {
                     boeDate: 1,
                     grossWeight: 1,
                     totPrice: 1,
+                    poNrs: 1,
                     invNrs: 1,
                     status: { 
                         $cond: {
@@ -127,5 +157,5 @@ function filterBool(element) {
 }
 
 function escape(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return !_.isUndefined(string) ? string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
 }
