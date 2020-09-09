@@ -3,12 +3,14 @@ const router = express.Router();
 const ImportItem = require('../../models/ImportItem');
 
 router.put('/', (req, res) => {
-    const { _id, srNr, desc, invNr, unitWeight, unitPrice, hsCode, country} = req.body;
+    const { _id, srNr, qty, desc, invNr, totWeight, totPrice, hsCode, country} = req.body;
+    const unitWeight = totWeight / qty || 0;
+    const unitPrice = totPrice / qty || 0;
     if (!_id) {
         return res.status(400).json({ message: 'importitemId is required.'});
     } else {
         let filter = { _id };
-        let update = { srNr, desc, invNr, unitWeight, unitPrice, hsCode, country};
+        let update = { srNr, qty, desc, invNr, unitWeight, unitPrice, hsCode, country};
         let options = { new: true };
     
         ImportItem.findOneAndUpdate(filter, update, options, function (err, importitem) {

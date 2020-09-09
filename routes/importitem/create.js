@@ -4,17 +4,18 @@ const ImportItem = require('../../models/ImportItem');
 
 router.post('/', (req, res) => {
 
-    const {srNr, desc, invNr, unitWeight, unitPrice, hsCode, country, documentId} = req.body;
+    const {srNr, qty, desc, invNr, totWeight, totPrice, hsCode, country, documentId} = req.body;
 
     if (!documentId ) {
         return res.status(400).json({ message: 'documentId is required.' });
     } else {
         const newItem = new ImportItem({
             srNr: srNr,
+            qty: qty,
             desc: desc,
             invNr: invNr,
-            unitWeight: unitWeight,
-            unitPrice: unitPrice,
+            unitWeight: totWeight / qty || 0,
+            unitPrice:  totPrice / qty || 0,
             hsCode: hsCode,
             country: country,
             documentId: documentId

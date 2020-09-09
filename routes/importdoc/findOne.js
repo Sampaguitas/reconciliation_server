@@ -34,24 +34,39 @@ router.post('/', (req, res) => {
                 return res.status(404).json({ message: 'Document not found.'});
             } else {
                 let regSrNr = new RegExp(escape(filter.srNr),'i');
-                let regWeigth = new RegExp(escape(filter.unitWeight), 'i');
-                let regPrice = new RegExp(escape(filter.unitPrice), 'i');
+                let regQty = new RegExp(escape(filter.qty),'i');
+                let regUnitWeigth = new RegExp(escape(filter.unitWeight), 'i');
+                let regTotWeigth = new RegExp(escape(filter.totWeight), 'i');
+                let regUnitPrice = new RegExp(escape(filter.unitPrice), 'i');
+                let regTotPrice = new RegExp(escape(filter.totPrice), 'i');
+                
                 let filtered = importDoc.items.reduce(function(acc, cur) {
-                    if (regSrNr.test(cur.srNrX) && regWeigth.test(cur.unitWeightX) && regPrice.test(cur.unitPriceX)) {
+                    
+                    let testSrNr = regSrNr.test(cur.srNrX);
+                    let testQty = regQty.test(cur.qtyX);
+                    let testUnitWeigth = regUnitWeigth.test(cur.unitWeightX);
+                    let testTotWeigth = regTotWeigth.test(cur.totWeightX);
+                    let testUnitPrice = regUnitPrice.test(cur.unitPriceX);
+                    let testTotPrice = regTotPrice.test(cur.totPriceX);
+                    
+                    if (testSrNr && testQty && testUnitWeigth && testTotWeigth && testUnitPrice && testTotPrice) {
                         acc.push({
                             _id: cur._id,
+                            qty: cur.qty,
                             srNr: cur.srNr,
                             desc: cur.desc,
                             invNr: cur.invNr,
                             unitWeight: cur.unitWeight,
+                            totWeight: cur.totWeight,
                             unitPrice: cur.unitPrice,
+                            totPrice: cur.totPrice,
                             hsCode: cur.hsCode,
                             country: cur.country,
-                            // documentId: cur.documentId
                         });
                     }
                     return acc;
                 }, []);
+
                 let pageLast = Math.ceil(filtered.length / pageSize) || 1;
                 let sliced = filtered.slice((nextPage - 1) * pageSize, ((nextPage - 1) * pageSize) + pageSize);
                 let firstItem = !_.isEmpty(sliced) ? ((nextPage - 1) * pageSize) + 1 : 0;

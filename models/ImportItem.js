@@ -7,6 +7,10 @@ const ImportItemSchema = new Schema({
         type: Number,
         required: true
     },
+    qty: {
+        type: Number,
+        required: true
+    },
     desc: {
         type: String,
         required: true
@@ -37,16 +41,38 @@ const ImportItemSchema = new Schema({
     }
 });
 
+ImportItemSchema.virtual("totWeight").get(function() {
+    return (this.unitWeight * this.qty) || 0;
+});
+
+ImportItemSchema.virtual("totPrice").get(function() {
+    return (this.unitPrice * this.qty) || 0;
+});
+
 ImportItemSchema.virtual("srNrX").get(function() {
     return this.srNr.toString();
+});
+
+ImportItemSchema.virtual("qtyX").get(function() {
+    return this.qty.toString();
 });
 
 ImportItemSchema.virtual("unitWeightX").get(function() {
     return this.unitWeight.toString();
 });
 
+ImportItemSchema.virtual("totWeightX").get(function() {
+    let totWeight = (this.unitWeight * this.qty) || 0
+    return totWeight.toString();
+});
+
 ImportItemSchema.virtual("unitPriceX").get(function() {
     return this.unitPrice.toString();
+});
+
+ImportItemSchema.virtual("totPriceX").get(function() {
+    let totPrice = (this.unitPrice * this.qty) || 0
+    return totPrice.toString();
 });
 
 ImportItemSchema.set('toJSON', { virtuals: true });
