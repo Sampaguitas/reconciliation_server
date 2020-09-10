@@ -50,9 +50,11 @@ app.use('/exportdoc/create', passport.authenticate('jwt', { session: false }), r
 app.use('/exportdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findAll'));
 //importdoc
 app.use('/importdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/create'));
+app.use('/importdoc/downloadFile', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/downloadFile'));
 app.use('/importdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findAll'));
 app.use('/importdoc/findOne', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findOne'));
 app.use('/importdoc/update', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/update'));
+app.use('/importdoc/uploadFile', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/uploadFile'));
 //importitem
 app.use('/importitem/create', passport.authenticate('jwt', { session: false }), require('./routes/importitem/create'));
 app.use('/importitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/importitem/delete'));

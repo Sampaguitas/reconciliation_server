@@ -82,6 +82,7 @@ router.post('/', (req, res) => {
                         grossWeight: importDoc.grossWeight,
                         totPrice: importDoc.totPrice,
                         isClosed: importDoc.isClosed,
+                        fileName: importDoc.fileName || '',
                         items: sliced
                     },
                     currentPage: nextPage,

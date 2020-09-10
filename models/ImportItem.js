@@ -7,11 +7,7 @@ const ImportItemSchema = new Schema({
         type: Number,
         required: true
     },
-    qty: {
-        type: Number,
-        required: true
-    },
-    desc: {
+    invNr: {
         type: String,
         required: true
     },
@@ -19,7 +15,11 @@ const ImportItemSchema = new Schema({
         type: String,
         required: true
     },
-    invNr: {
+    qty: {
+        type: Number,
+        required: true
+    },
+    desc: {
         type: String,
         required: true
     },

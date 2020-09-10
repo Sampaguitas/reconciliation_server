@@ -27,6 +27,10 @@ const ImportDocSchema = new Schema({
         type: Boolean,
         default: false
     },
+    fileName: {
+        type: String,
+        default: ''
+    }
 });
 
 ImportDocSchema.virtual("items", {
