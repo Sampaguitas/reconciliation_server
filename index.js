@@ -58,6 +58,7 @@ app.use('/importitem/create', passport.authenticate('jwt', { session: false }), 
 app.use('/importitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/importitem/delete'));
 app.use('/importitem/downloadDuf', passport.authenticate('jwt', { session: false }), require('./routes/importitem/downloadDuf'));
 app.use('/importitem/update', passport.authenticate('jwt', { session: false }), require('./routes/importitem/update'));
+app.use('/importitem/uploadDuf', passport.authenticate('jwt', { session: false }), require('./routes/importitem/uploadDuf'));
 //user
 app.use('/user/changePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/changePwd'));
 app.use('/user/create', passport.authenticate('jwt', { session: false }), require('./routes/user/create'));
