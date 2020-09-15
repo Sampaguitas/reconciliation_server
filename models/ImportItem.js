@@ -53,6 +53,46 @@ const ImportItemSchema = new Schema({
     }
 });
 
+ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function(doc, next) {
+    let documentId = doc.documentId;
+    mongoose.model('importitems').find({ documentId: documentId }, function(errItems, resItems) {
+        if (!!errItems || !resItems) {
+            next();
+        } else {
+            let totals = resItems.reduce(function(acc, cur) {
+                if (!!cur.invNr && !acc.invNrs.includes(cur.invNr)) {
+                    if(acc.invNrs == "") {
+                        acc.invNrs = cur.invNr
+                    } else {
+                        acc.invNrs += `| ${cur.invNr}`
+                    }
+                }
+                if (!!cur.poNr && !acc.poNrs.includes(cur.poNr)) {
+                    if(acc.poNrs == "") {
+                        acc.poNrs = cur.poNr
+                    } else {
+                        acc.poNrs += `| ${cur.poNr}`
+                    }
+                }
+                acc.totWeight += cur.totWeight || 0;
+                acc.totPrice += cur.totPrice || 0;
+                return acc;
+            }, { invNrs: "", poNrs: "", totWeight: 0, totPrice: 0 });
+            let { invNrs, poNrs, totWeight, totPrice } = totals;
+            let update = { invNrs, poNrs, totWeight, totPrice };
+            let options = { new: true };
+            mongoose.model('importdocs').findByIdAndUpdate(documentId, update, options, function (errDoc, resDoc) {
+                if (!!errDoc || !resDoc) {
+                    next();
+                } else {
+                    next();
+                }
+            });
+        }
+    });
+});
+
+
 ImportItemSchema.virtual("srNrX").get(function() {
     return !_.isUndefined(this.srNr) ? this.srNr.toString() : "";
 });

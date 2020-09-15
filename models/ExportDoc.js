@@ -19,7 +19,7 @@ const ExportDocSchema = new Schema({
         type: Date,
         required: false
     },
-    grossWeight:{
+    totWeight:{
         type: Number,
         required: true,
     },

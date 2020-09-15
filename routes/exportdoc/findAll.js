@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
             {
                 $addFields: {
                     boeDateX: { $dateToString: { format, date: "$boeDate" } },
-                    grossWeightX: { $toString: "$grossWeight" },
+                    totWeightX: { $toString: "$totWeight" },
                     totPriceX: { $toString: "$totPrice" },
                 }
             },
@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
                     decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
                     boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
                     boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
-                    grossWeightX: { $regex: new RegExp(escape(filter.grossWeight),'i') },
+                    totWeightX: { $regex: new RegExp(escape(filter.totWeight),'i') },
                     totPriceX: { $regex: new RegExp(escape(filter.totPrice),'i') },
                 }
             }

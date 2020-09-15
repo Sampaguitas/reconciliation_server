@@ -4,13 +4,13 @@ const ImportDoc = require('../../models/ImportDoc');
 
 router.post('/', (req, res) => {
 
-    const {decNr, boeNr, boeDate, grossWeight, totPrice} = req.body;
+    const {decNr, boeNr, boeDate } = req.body;
 
     if (!decNr || !decNr ) {
         return res.status(400).json({ message: 'DEC and BOE numbers are required.' });
     } else {
         let conditions =  { decNr, boeNr };
-        let update = { boeDate, grossWeight, totPrice };
+        let update = { poNrs: "", invNrs: "", boeDate, totWeight: 0, totPrice: 0 };
         let options = {new: true, upsert: true};
         
         ImportDoc.findOneAndUpdate(conditions, update, options , function (errDoc, resDoc) {

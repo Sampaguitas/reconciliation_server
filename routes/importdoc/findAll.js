@@ -14,75 +14,10 @@ router.post('/', (req, res) => {
         ImportDoc
         .aggregate([
             {
-                $lookup: {
-                    from: "importitems",
-                    localField: "_id",
-                    foreignField: "documentId",
-                    as: "items",
-                },
-            },
-            {
                 $addFields: {
                     boeDateX: { $dateToString: { format, date: "$boeDate" } },
-                    grossWeightX: { $toString: "$grossWeight" },
-                    totPriceX: { $toString: "$totPrice" },
-                    "poNrs": {
-                        $reduce: {
-                            input: "$items",
-                            initialValue: "",
-                            in: { 
-                                $concat: [
-                                    "$$value",
-                                    {
-                                        $cond: {
-                                            if: {
-                                                $indexOfCP: ["$$value", "$$this.poNr"]
-                                            },
-                                            then: { 
-                                                $cond: {
-                                                    if: {
-                                                        $eq: ["$$value", ""]
-                                                    },
-                                                    then: "$$this.poNr",
-                                                    else: " | $$this.poNr",
-                                                }, 
-                                            }, 
-                                            else : ""
-                                        }
-                                    },
-                                ]
-                            }
-                        }
-                    },
-                    "invNrs": {
-                        $reduce: {
-                            input: "$items",
-                            initialValue: "",
-                            in: { 
-                                $concat: [
-                                    "$$value",
-                                    {
-                                        $cond: {
-                                            if: {
-                                                $indexOfCP: ["$$value", "$$this.invNr"]
-                                            },
-                                            then: { 
-                                                $cond: {
-                                                    if: {
-                                                        $eq: ["$$value", ""]
-                                                    },
-                                                    then: "$$this.invNr",
-                                                    else: " | $$this.invNr",
-                                                }, 
-                                            }, 
-                                            else : ""
-                                        }
-                                    },
-                                ]
-                            }
-                        }
-                    },
-                    
+                    totWeightX: { $toString: "$totWeight" },
+                    totPriceX: { $toString: "$totPrice" },   
                 }
             },
             {
@@ -92,7 +27,7 @@ router.post('/', (req, res) => {
                     poNrs: { $regex: new RegExp(escape(filter.poNrs),'i') },
                     invNrs: { $regex: new RegExp(escape(filter.invNrs),'i') },
                     boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
-                    grossWeightX: { $regex: new RegExp(escape(filter.grossWeight),'i') },
+                    totWeightX: { $regex: new RegExp(escape(filter.totWeight),'i') },
                     totPriceX: { $regex: new RegExp(escape(filter.totPrice),'i') },
                     isClosed : { $in: filterBool(filter.isClosed)},
                 }
@@ -102,7 +37,7 @@ router.post('/', (req, res) => {
                     decNr: 1,
                     boeNr: 1,
                     boeDate: 1,
-                    grossWeight: 1,
+                    totWeight: 1,
                     totPrice: 1,
                     poNrs: 1,
                     invNrs: 1,

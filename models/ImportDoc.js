@@ -7,7 +7,6 @@ const accessKeyId = require('../config/keys').accessKeyId;
 const secretAccessKey = require('../config/keys').secretAccessKey;
 const region = require('../config/keys').region;
 const awsBucketName = require('../config/keys').awsBucketName;
-const ImportItem = require('./ImportItem');
 
 aws.config.update({
     accessKeyId: accessKeyId,
@@ -28,13 +27,21 @@ const ImportDocSchema = new Schema({
         type: Date,
         required: true
     },
-    grossWeight:{
+    totWeight:{
         type: Number,
-        required: true,
+        default: 0,
     },
     totPrice: {
         type: Number,
-        required: true,
+        default: 0,
+    },
+    poNrs: {
+        type: String,
+        default: "",
+    },
+    invNrs: {
+        type: String,
+        default: "",
     },
     isClosed: {
         type: Boolean,
@@ -67,7 +74,7 @@ function findItems(documentId) {
         if (!documentId) {
             resolve();
         } else {
-            ImportItem.find({ documentId: documentId }, function (err, items) {
+            mongoose.model('importitems').find({ documentId: documentId }, function (err, items) {
                 if (err || _.isEmpty(items)) {
                     resolve();
                 } else {
@@ -85,7 +92,7 @@ function deleteItem(itemId) {
         if (!itemId) {
             resolve();
         } else {
-            ImportItem.findByIdAndDelete(itemId, function (err, res) {
+            mongoose.model('importitems').findByIdAndDelete(itemId, function (err, res) {
                 if (!!err || !res) {
                     resolve();
                 } else {

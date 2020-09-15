@@ -12,7 +12,6 @@ router.put('/', (req, res) => {
         let filter = { _id };
         let update = { srNr, qty, desc, poNr, invNr, unitWeight, totWeight, unitPrice, totPrice, hsCode, country};
         let options = { new: true };
-    
         ImportItem.findOneAndUpdate(filter, update, options, function (err, importitem) {
             if (err) {
                 console.log(err);
