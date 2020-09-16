@@ -19,7 +19,8 @@ let headers = [
   { number: 'H', key: 'insurance', value: 'Insurance', type: 'number' },
   { number: 'I', key: 'exRate', value: 'Ex Rate', type: 'number' },
   { number: 'J', key: 'hsCode', value: 'HS Code', type: 'text' },
-  { number: 'K', key: 'country', value: 'Country', type: 'text' },
+  { number: 'K', key: 'hsDesc', value: 'HS Desc', type: 'text' },
+  { number: 'L', key: 'country', value: 'Country', type: 'text' },
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
@@ -198,6 +199,12 @@ router.post('/', upload.single('file'), function (req, res) {
           isRejected: true,
           reason: 'HS Code should not be empty.'
         });
+      } else if (!tempItem.hsDesc) {
+        resolve({
+          row: row,
+          isRejected: true,
+          reason: 'HS Desc should not be empty.'
+        });
       } else if (!tempItem.country) {
         resolve({
           row: row,
@@ -223,6 +230,7 @@ router.post('/', upload.single('file'), function (req, res) {
           unitPrice: totPrice / tempItem.qty || 0,
           totPrice: totPrice,
           hsCode: tempItem.hsCode,
+          hsDesc: tempItem.hsDesc,
           country: tempItem.country,
           documentId: documentId
         });

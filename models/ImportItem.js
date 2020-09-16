@@ -43,6 +43,10 @@ const ImportItemSchema = new Schema({
         type: String,
         required: true
     },
+    hsDesc: {
+        type: String,
+        required: true
+    },
     country: {
         type: String,
         required: true
@@ -74,12 +78,24 @@ ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                         acc.poNrs += `| ${cur.poNr}`
                     }
                 }
+                acc.qty += cur.qty || 0;
                 acc.totWeight += cur.totWeight || 0;
                 acc.totPrice += cur.totPrice || 0;
+                let found = acc.summary.find(element => _.isEqual(element.hsCode, cur.hsCode) && _.isEqual(element.country, cur.country) && _.isEqual(element.hsDesc, cur.hsDesc));
+                if (_.isUndefined(found)) {
+                    acc.summary.push({
+                        hsCode: cur.hsCode,
+                        hsDesc: cur.hsDesc,
+                        country: cur.country,
+                        totPrice: cur.totPrice,
+                    });
+                } else {
+                    found.totPrice += cur.totPrice;
+                }
                 return acc;
-            }, { invNrs: "", poNrs: "", totWeight: 0, totPrice: 0 });
-            let { invNrs, poNrs, totWeight, totPrice } = totals;
-            let update = { invNrs, poNrs, totWeight, totPrice };
+            }, { invNrs: "", poNrs: "", qty: 0, totWeight: 0, totPrice: 0, summary: [] });
+            let { invNrs, poNrs, qty, totWeight, totPrice, summary } = totals;
+            let update = { invNrs, poNrs, qty, totWeight, totPrice, summary };
             let options = { new: true };
             mongoose.model('importdocs').findByIdAndUpdate(documentId, update, options, function (errDoc, resDoc) {
                 if (!!errDoc || !resDoc) {

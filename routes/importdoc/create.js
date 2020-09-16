@@ -10,7 +10,7 @@ router.post('/', (req, res) => {
         return res.status(400).json({ message: 'DEC and BOE numbers are required.' });
     } else {
         let conditions =  { decNr, boeNr };
-        let update = { poNrs: "", invNrs: "", boeDate, totWeight: 0, totPrice: 0 };
+        let update = { poNrs: "", invNrs: "", boeDate, qty: 0, totWeight: 0, totPrice: 0, summary: [] };
         let options = {new: true, upsert: true};
         
         ImportDoc.findOneAndUpdate(conditions, update, options , function (errDoc, resDoc) {

@@ -27,6 +27,10 @@ const ImportDocSchema = new Schema({
         type: Date,
         required: true
     },
+    qty: {
+        type: Number,
+        default: 0,
+    },
     totWeight:{
         type: Number,
         default: 0,
@@ -47,6 +51,24 @@ const ImportDocSchema = new Schema({
         type: Boolean,
         default: false
     },
+    summary: [{
+        hsCode: {
+            type: String,
+            required: true  
+        },
+        hsDesc: {
+            type: String,
+            required: true
+        },
+        country: {
+            type: String,
+            required: true
+        },
+        totPrice: {
+            type: Number,
+            required: true
+        },
+    }],
     fileName: {
         type: String,
         default: ''

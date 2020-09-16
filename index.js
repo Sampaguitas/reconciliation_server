@@ -57,10 +57,8 @@ app.use('/importdoc/findOne', passport.authenticate('jwt', { session: false }), 
 app.use('/importdoc/update', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/update'));
 app.use('/importdoc/uploadFile', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/uploadFile'));
 //importitem
-app.use('/importitem/create', passport.authenticate('jwt', { session: false }), require('./routes/importitem/create'));
 app.use('/importitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/importitem/delete'));
 app.use('/importitem/downloadDuf', passport.authenticate('jwt', { session: false }), require('./routes/importitem/downloadDuf'));
-app.use('/importitem/update', passport.authenticate('jwt', { session: false }), require('./routes/importitem/update'));
 app.use('/importitem/uploadDuf', passport.authenticate('jwt', { session: false }), require('./routes/importitem/uploadDuf'));
 //user
 app.use('/user/changePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/changePwd'));

@@ -14,7 +14,8 @@ let headers = [
     { number: 'H', value: 'Insurance' },
     { number: 'I', value: 'Ex Rate' },
     { number: 'J', value: 'HS Code' },
-    { number: 'K', value: 'Country' },
+    { number: 'K', value: 'HS Desc' },
+    { number: 'L', value: 'Country' },
 ];
 
 router.get('/', function (req, res) {

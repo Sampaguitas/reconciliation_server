@@ -79,10 +79,12 @@ router.post('/', (req, res) => {
                         decNr: importDoc.decNr,
                         boeNr: importDoc.boeNr,
                         boeDate: importDoc.boeDate,
+                        qty: importDoc.qty,
                         totWeight: importDoc.totWeight,
                         totPrice: importDoc.totPrice,
                         isClosed: importDoc.isClosed,
                         fileName: importDoc.fileName || '',
+                        summary: importDoc.summary || [],
                         items: sliced
                     },
                     currentPage: nextPage,
