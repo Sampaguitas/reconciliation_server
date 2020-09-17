@@ -16,9 +16,10 @@ router.post('/', (req, res) => {
         .populate({
             path: 'items',
             match: {
-                desc : { $regex: new RegExp(escape(filter.desc),'i') },
-                poNr : { $regex: new RegExp(escape(filter.poNr),'i') },
                 invNr : { $regex: new RegExp(escape(filter.invNr),'i') },
+                poNr : { $regex: new RegExp(escape(filter.poNr),'i') },
+                artNr: { $regex: new RegExp(escape(filter.artNr),'i') },
+                desc : { $regex: new RegExp(escape(filter.desc),'i') },
                 country : { $regex: new RegExp(escape(filter.country),'i') },
                 hsCode : { $regex: new RegExp(escape(filter.hsCode),'i') },
             },
@@ -53,11 +54,12 @@ router.post('/', (req, res) => {
                     if (testSrNr && testQty && testUnitWeigth && testTotWeigth && testUnitPrice && testTotPrice) {
                         acc.push({
                             _id: cur._id,
-                            qty: cur.qty,
                             srNr: cur.srNr,
-                            desc: cur.desc,
-                            poNr: cur.poNr,
                             invNr: cur.invNr,
+                            poNr: cur.poNr,
+                            artNr: cur.artNr,
+                            desc: cur.desc,
+                            qty: cur.qty,
                             unitWeight: cur.unitWeight,
                             totWeight: cur.totWeight,
                             unitPrice: cur.unitPrice,

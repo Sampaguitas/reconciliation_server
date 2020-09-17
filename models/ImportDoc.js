@@ -64,6 +64,14 @@ const ImportDocSchema = new Schema({
             type: String,
             required: true
         },
+        qty: {
+            type: Number,
+            required: true
+        },
+        totWeight: {
+            type: Number,
+            required: true
+        },
         totPrice: {
             type: Number,
             required: true

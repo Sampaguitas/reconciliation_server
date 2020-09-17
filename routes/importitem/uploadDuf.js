@@ -12,15 +12,16 @@ let headers = [
   { number: 'A', key: 'srNr', value: 'SrNo', type: 'number' },
   { number: 'B', key: 'invNr', value: 'Inv Nr', type: 'text' },
   { number: 'C', key: 'poNr', value: 'PO Nr', type: 'text' },
-  { number: 'D', key: 'qty', value: 'Qty', type: 'number' },
+  { number: 'D', key: 'artNr', value: 'Art Nr', type: 'text' },
   { number: 'E', key: 'desc', value: 'Description', type: 'text' },
-  { number: 'F', key: 'totWeight', value: 'Total Weight', type: 'number' },
-  { number: 'G', key: 'totPrice', value: 'Total Price', type: 'number' },
-  { number: 'H', key: 'insurance', value: 'Insurance', type: 'number' },
-  { number: 'I', key: 'exRate', value: 'Ex Rate', type: 'number' },
-  { number: 'J', key: 'hsCode', value: 'HS Code', type: 'text' },
-  { number: 'K', key: 'hsDesc', value: 'HS Desc', type: 'text' },
-  { number: 'L', key: 'country', value: 'Country', type: 'text' },
+  { number: 'F', key: 'qty', value: 'Qty', type: 'number' },
+  { number: 'G', key: 'totWeight', value: 'Total Weight', type: 'number' },
+  { number: 'H', key: 'totPrice', value: 'Total Price', type: 'number' },
+  { number: 'I', key: 'insurance', value: 'Insurance', type: 'number' },
+  { number: 'J', key: 'exRate', value: 'Ex Rate', type: 'number' },
+  { number: 'K', key: 'hsCode', value: 'HS Code', type: 'text' },
+  { number: 'L', key: 'hsDesc', value: 'HS Desc', type: 'text' },
+  { number: 'M', key: 'country', value: 'Country', type: 'text' },
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
@@ -163,17 +164,23 @@ router.post('/', upload.single('file'), function (req, res) {
           isRejected: true,
           reason: 'PO Nr should not be empty.'
         });
-      } else if (!tempItem.qty) {
+      } else if (!tempItem.artNr) {
         resolve({
           row: row,
           isRejected: true,
-          reason: 'Qty should not be empty.'
+          reason: 'Art Nr should not be empty.'
         });
       } else if (!tempItem.desc) {
         resolve({
           row: row,
           isRejected: true,
           reason: 'Description should not be empty.'
+        });
+      } else if (!tempItem.qty) {
+        resolve({
+          row: row,
+          isRejected: true,
+          reason: 'Qty should not be empty.'
         });
       } else if (!tempItem.totWeight) {
         resolve({
@@ -213,7 +220,6 @@ router.post('/', upload.single('file'), function (req, res) {
         });
       } else {
         
-
         let insurance = tempItem.insurance || 0;
         let totPrice = (tempItem.totPrice + insurance) * tempItem.exRate;
 
@@ -223,8 +229,9 @@ router.post('/', upload.single('file'), function (req, res) {
           srNr: tempItem.srNr,
           invNr: tempItem.invNr,
           poNr: tempItem.poNr,
-          qty: tempItem.qty,
+          artNr: tempItem.artNr,
           desc: tempItem.desc,
+          qty: tempItem.qty,
           unitWeight: tempItem.totWeight / tempItem.qty || 0,
           totWeight: tempItem.totWeight,
           unitPrice: totPrice / tempItem.qty || 0,

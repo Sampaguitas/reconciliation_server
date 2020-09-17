@@ -11,6 +11,8 @@ router.delete('/', async (req, res) => {
 
     if (_.isEmpty(selectedIds)) {
         return res.status(400).json({message: 'Select lines to be deleted.'});
+    } else if(!req.user.isAdmin){
+        return res.status(400).json({ message: 'You are not authorised to delete items.' });
     } else {
         selectedIds.map(selectedId => myPromises.push(removeItem(selectedId)));
         await Promise.all(myPromises).then(resPromises => {

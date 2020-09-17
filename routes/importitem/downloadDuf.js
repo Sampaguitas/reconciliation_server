@@ -4,18 +4,19 @@ var Excel = require('exceljs');
 fs = require('fs');
 
 let headers = [
-    { number: 'A', value: 'SrNo' },
+    { number: 'A', value: '#' },
     { number: 'B', value: 'Inv Nr' },
     { number: 'C', value: 'PO Nr' },
-    { number: 'D', value: 'Qty' },
+    { number: 'D', value: 'Art Nr' },
     { number: 'E', value: 'Description' },
-    { number: 'F', value: 'Total Weight' },
-    { number: 'G', value: 'Total Price' },
-    { number: 'H', value: 'Insurance' },
-    { number: 'I', value: 'Ex Rate' },
-    { number: 'J', value: 'HS Code' },
-    { number: 'K', value: 'HS Desc' },
-    { number: 'L', value: 'Country' },
+    { number: 'F', value: 'Qty' },
+    { number: 'G', value: 'Total Weight' },
+    { number: 'H', value: 'Total Price' },
+    { number: 'I', value: 'Insurance' },
+    { number: 'J', value: 'Ex Rate' },
+    { number: 'K', value: 'HS Code' },
+    { number: 'L', value: 'HS Desc' },
+    { number: 'M', value: 'Country' },
 ];
 
 router.get('/', function (req, res) {

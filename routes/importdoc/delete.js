@@ -8,6 +8,8 @@ router.delete('/', async (req, res) => {
 
     if (_.isEmpty(documentId)) {
         return res.status(400).json({message: 'documentId is missing.'});
+    } else if(!req.user.isAdmin){
+        return res.status(400).json({ message: 'You are not authorised to delete documents.' });
     } else {
         ImportDoc.findByIdAndDelete(documentId, function (err, doc) {
             if (!!err || !doc) {

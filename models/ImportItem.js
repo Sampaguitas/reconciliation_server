@@ -15,12 +15,16 @@ const ImportItemSchema = new Schema({
         type: String,
         required: true
     },
-    qty: {
-        type: Number,
+    artNr: {
+        type: String,
         required: true
     },
     desc: {
         type: String,
+        required: true
+    },
+    qty: {
+        type: Number,
         required: true
     },
     unitWeight: {
@@ -87,9 +91,13 @@ ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                         hsCode: cur.hsCode,
                         hsDesc: cur.hsDesc,
                         country: cur.country,
+                        qty: cur.qty,
+                        totWeight: cur.totWeight,
                         totPrice: cur.totPrice,
                     });
                 } else {
+                    found.qty += cur.qty;
+                    found.totWeight += cur.totWeight;
                     found.totPrice += cur.totPrice;
                 }
                 return acc;
