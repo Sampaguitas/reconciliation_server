@@ -23,19 +23,31 @@ const ImportDocSchema = new Schema({
         type: String,
         required: true
     },
+    sfiNr: {
+        type: String,
+        required: true
+    },
     boeDate: {
         type: Date,
         required: true
     },
-    qty: {
+    pcs: {
         type: Number,
         default: 0,
     },
-    totWeight:{
+    mtr: {
         type: Number,
         default: 0,
     },
-    totPrice: {
+    totalNetWeight:{
+        type: Number,
+        default: 0,
+    },
+    totalGrossWeight:{
+        type: Number,
+        default: 0,
+    },
+    totalPrice: {
         type: Number,
         default: 0,
     },
@@ -64,15 +76,23 @@ const ImportDocSchema = new Schema({
             type: String,
             required: true
         },
-        qty: {
+        pcs: {
             type: Number,
             required: true
         },
-        totWeight: {
+        mtr: {
             type: Number,
             required: true
         },
-        totPrice: {
+        totalNetWeight:{
+            type: Number,
+            default: 0,
+        },
+        totalGrossWeight: {
+            type: Number,
+            required: true
+        },
+        totalPrice: {
             type: Number,
             required: true
         },

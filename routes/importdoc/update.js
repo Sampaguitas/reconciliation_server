@@ -3,12 +3,12 @@ const router = express.Router();
 const ImportDoc = require('../../models/ImportDoc');
 
 router.put('/', (req, res) => {
-    const { _id, decNr, boeNr, boeDate } = req.body;
+    const { _id, decNr, boeNr, sfiNr, boeDate } = req.body;
     if (!_id) {
         return res.status(400).json({ message: 'importdocId is required.'});
     } else {
         let filter = { _id };
-        let update = { decNr, boeNr, boeDate };
+        let update = { decNr, boeNr, sfiNr, boeDate };
         let options = { new: true };
     
         ImportDoc.findOneAndUpdate(filter, update, options, function (err, importdoc) {

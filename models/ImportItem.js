@@ -23,15 +23,27 @@ const ImportItemSchema = new Schema({
         type: String,
         required: true
     },
-    qty: {
+    pcs: {
         type: Number,
         required: true
     },
-    unitWeight: {
+    mtr: {
         type: Number,
         required: true
     },
-    totWeight: {
+    unitNetWeight: {
+        type: Number,
+        required: true
+    },
+    totalNetWeight: {
+        type: Number,
+        required: true
+    },
+    unitGrossWeight: {
+        type: Number,
+        required: true
+    },
+    totalGrossWeight: {
         type: Number,
         required: true
     },
@@ -39,7 +51,7 @@ const ImportItemSchema = new Schema({
         type: Number,
         required: true
     },
-    totPrice: {
+    totalPrice: {
         type: Number,
         required: true
     },
@@ -82,28 +94,36 @@ ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                         acc.poNrs += `| ${cur.poNr}`
                     }
                 }
-                acc.qty += cur.qty || 0;
-                acc.totWeight += cur.totWeight || 0;
-                acc.totPrice += cur.totPrice || 0;
+                acc.pcs += cur.pcs || 0;
+                acc.mtr += cur.mtr || 0;
+                acc.totalNetWeight += cur.totalNetWeight || 0;
+                acc.totalGrossWeight += cur.totalGrossWeight || 0;
+                acc.totalPrice += cur.totalPrice || 0;
                 let found = acc.summary.find(element => _.isEqual(element.hsCode, cur.hsCode) && _.isEqual(element.country, cur.country) && _.isEqual(element.hsDesc, cur.hsDesc));
                 if (_.isUndefined(found)) {
                     acc.summary.push({
                         hsCode: cur.hsCode,
                         hsDesc: cur.hsDesc,
                         country: cur.country,
-                        qty: cur.qty,
-                        totWeight: cur.totWeight,
-                        totPrice: cur.totPrice,
+                        pcs: cur.pcs,
+                        mtr: !!cur.mtr ? cur.mtr : 0,
+                        totalNetWeight: cur.totalNetWeight,
+                        totalGrossWeight: cur.totalGrossWeight,
+                        totalPrice: cur.totalPrice,
                     });
                 } else {
-                    found.qty += cur.qty;
-                    found.totWeight += cur.totWeight;
-                    found.totPrice += cur.totPrice;
+                    found.pcs += cur.pcs;
+                    if (!!cur.mtr) {
+                        found.mtr += cur.mtr;
+                    };
+                    found.totalNetWeight += cur.totalNetWeight,
+                    found.totalGrossWeight += cur.totalGrossWeight;
+                    found.totalPrice += cur.totalPrice;
                 }
                 return acc;
-            }, { invNrs: "", poNrs: "", qty: 0, totWeight: 0, totPrice: 0, summary: [] });
-            let { invNrs, poNrs, qty, totWeight, totPrice, summary } = totals;
-            let update = { invNrs, poNrs, qty, totWeight, totPrice, summary };
+            }, { invNrs: "", poNrs: "", pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [] });
+            let { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary } = totals;
+            let update = { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary };
             let options = { new: true };
             mongoose.model('importdocs').findByIdAndUpdate(documentId, update, options, function (errDoc, resDoc) {
                 if (!!errDoc || !resDoc) {
@@ -121,24 +141,36 @@ ImportItemSchema.virtual("srNrX").get(function() {
     return !_.isUndefined(this.srNr) ? this.srNr.toString() : "";
 });
 
-ImportItemSchema.virtual("qtyX").get(function() {
-    return !_.isUndefined(this.qty) ? this.qty.toString() : "";
+ImportItemSchema.virtual("pcsX").get(function() {
+    return !_.isUndefined(this.pcs) ? this.pcs.toString() : "";
 });
 
-ImportItemSchema.virtual("unitWeightX").get(function() {
-    return !_.isUndefined(this.unitWeight) ? this.unitWeight.toString() : "";
+ImportItemSchema.virtual("mtrX").get(function() {
+    return !_.isUndefined(this.mtr) ? this.mtr.toString() : "";
 });
 
-ImportItemSchema.virtual("totWeightX").get(function() {
-    return !_.isUndefined(this.totWeight) ? this.totWeight.toString() : "";
+// ImportItemSchema.virtual("unitNetWeightX").get(function() {
+//     return !_.isUndefined(this.unitNetWeight) ? this.unitNetWeight.toString() : "";
+// });
+
+ImportItemSchema.virtual("totalNetWeightX").get(function() {
+    return !_.isUndefined(this.totalNetWeight) ? this.totalNetWeight.toString() : "";
+});
+
+// ImportItemSchema.virtual("unitGrossWeightX").get(function() {
+//     return !_.isUndefined(this.unitGrossWeight) ? this.unitGrossWeight.toString() : "";
+// });
+
+ImportItemSchema.virtual("totalGrossWeightX").get(function() {
+    return !_.isUndefined(this.totalGrossWeight) ? this.totalGrossWeight.toString() : "";
 });
 
 ImportItemSchema.virtual("unitPriceX").get(function() {
     return !_.isUndefined(this.unitPrice) ? this.unitPrice.toString() : "";
 });
 
-ImportItemSchema.virtual("totPriceX").get(function() {
-    return !_.isUndefined(this.totPrice) ? this.totPrice.toString() : "";
+ImportItemSchema.virtual("totalPriceX").get(function() {
+    return !_.isUndefined(this.totalPrice) ? this.totalPrice.toString() : "";
 });
 
 ImportItemSchema.set('toJSON', { virtuals: true });

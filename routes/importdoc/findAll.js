@@ -16,19 +16,22 @@ router.post('/', (req, res) => {
             {
                 $addFields: {
                     boeDateX: { $dateToString: { format, date: "$boeDate" } },
-                    totWeightX: { $toString: "$totWeight" },
-                    totPriceX: { $toString: "$totPrice" },   
+                    totalNetWeightX: { $toString: "$totalNetWeight" },
+                    totalGrossWeightX: { $toString: "$totalGrossWeight" },
+                    totalPriceX: { $toString: "$totalPrice" },   
                 }
             },
             {
                 $match: {
                     decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
                     boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
+                    sfiNr : { $regex: new RegExp(escape(filter.sfiNr),'i') },
                     poNrs: { $regex: new RegExp(escape(filter.poNrs),'i') },
                     invNrs: { $regex: new RegExp(escape(filter.invNrs),'i') },
                     boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
-                    totWeightX: { $regex: new RegExp(escape(filter.totWeight),'i') },
-                    totPriceX: { $regex: new RegExp(escape(filter.totPrice),'i') },
+                    totalNetWeightX: { $regex: new RegExp(escape(filter.totalNetWeight),'i') },
+                    totalGrossWeightX: { $regex: new RegExp(escape(filter.totalGrossWeight),'i') },
+                    totalPriceX: { $regex: new RegExp(escape(filter.totalPrice),'i') },
                     isClosed : { $in: filterBool(filter.isClosed)},
                 }
             },
@@ -36,9 +39,11 @@ router.post('/', (req, res) => {
                 $project: {
                     decNr: 1,
                     boeNr: 1,
+                    sfiNr: 1,
                     boeDate: 1,
-                    totWeight: 1,
-                    totPrice: 1,
+                    totalNetWeight: 1,
+                    totalGrossWeight: 1,
+                    totalPrice: 1,
                     poNrs: 1,
                     invNrs: 1,
                     status: { 

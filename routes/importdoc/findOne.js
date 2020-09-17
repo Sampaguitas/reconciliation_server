@@ -4,7 +4,7 @@ const ImportDoc = require('../../models/ImportDoc');
 const _ = require('lodash');
 
 router.post('/', (req, res) => {
-    let { sort, filter, pageSize, dateFormat } = req.body;
+    let { sort, filter, pageSize } = req.body;
     let nextPage = req.body.nextPage || 1;
     if (!pageSize) {
         res.status(400).json({message: 'pageSize should be greater than 0.'});
@@ -36,22 +36,24 @@ router.post('/', (req, res) => {
                 return res.status(404).json({ message: 'Document not found.'});
             } else {
                 let regSrNr = new RegExp(escape(filter.srNr),'i');
-                let regQty = new RegExp(escape(filter.qty),'i');
-                let regUnitWeigth = new RegExp(escape(filter.unitWeight), 'i');
-                let regTotWeigth = new RegExp(escape(filter.totWeight), 'i');
+                let regPcs = new RegExp(escape(filter.pcs),'i');
+                let regMtr = new RegExp(escape(filter.mtr),'i');
+                let regNetWeigth = new RegExp(escape(filter.totalNetWeight), 'i');
+                let regGrossWeigth = new RegExp(escape(filter.totalGrossWeight), 'i');
                 let regUnitPrice = new RegExp(escape(filter.unitPrice), 'i');
-                let regTotPrice = new RegExp(escape(filter.totPrice), 'i');
+                let regTotalPrice = new RegExp(escape(filter.totalPrice), 'i');
                 
                 let filtered = importDoc.items.reduce(function(acc, cur) {
                     
                     let testSrNr = regSrNr.test(cur.srNrX);
-                    let testQty = regQty.test(cur.qtyX);
-                    let testUnitWeigth = regUnitWeigth.test(cur.unitWeightX);
-                    let testTotWeigth = regTotWeigth.test(cur.totWeightX);
+                    let testPcs = regPcs.test(cur.pcsX);
+                    let testMtr = regMtr.test(cur.mtrX);
+                    let testNetWeigth = regNetWeigth.test(cur.totalNetWeightX);
+                    let testTotWeigth = regGrossWeigth.test(cur.totalGrossWeightX);
                     let testUnitPrice = regUnitPrice.test(cur.unitPriceX);
-                    let testTotPrice = regTotPrice.test(cur.totPriceX);
+                    let testTotalPrice = regTotalPrice.test(cur.totalPriceX);
                     
-                    if (testSrNr && testQty && testUnitWeigth && testTotWeigth && testUnitPrice && testTotPrice) {
+                    if (testSrNr && testPcs && testMtr && testNetWeigth && testTotWeigth && testUnitPrice && testTotalPrice) {
                         acc.push({
                             _id: cur._id,
                             srNr: cur.srNr,
@@ -59,11 +61,12 @@ router.post('/', (req, res) => {
                             poNr: cur.poNr,
                             artNr: cur.artNr,
                             desc: cur.desc,
-                            qty: cur.qty,
-                            unitWeight: cur.unitWeight,
-                            totWeight: cur.totWeight,
+                            pcs: cur.pcs,
+                            mtr: cur.mtr,
+                            totalNetWeight: cur.totalNetWeight,
+                            totalGrossWeight: cur.totalGrossWeight,
                             unitPrice: cur.unitPrice,
-                            totPrice: cur.totPrice,
+                            totalPrice: cur.totalPrice,
                             hsCode: cur.hsCode,
                             country: cur.country,
                         });
@@ -80,10 +83,11 @@ router.post('/', (req, res) => {
                         _id: importDoc._id,
                         decNr: importDoc.decNr,
                         boeNr: importDoc.boeNr,
+                        sfiNr: importDoc.sfiNr,
                         boeDate: importDoc.boeDate,
-                        qty: importDoc.qty,
-                        totWeight: importDoc.totWeight,
-                        totPrice: importDoc.totPrice,
+                        pcs: importDoc.pcs,
+                        totalGrossWeight: importDoc.totalGrossWeight,
+                        totalPrice: importDoc.totalPrice,
                         isClosed: importDoc.isClosed,
                         fileName: importDoc.fileName || '',
                         summary: importDoc.summary || [],

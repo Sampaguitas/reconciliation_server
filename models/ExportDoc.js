@@ -19,11 +19,11 @@ const ExportDocSchema = new Schema({
         type: Date,
         required: false
     },
-    totWeight:{
+    totalGrossWeight:{
         type: Number,
         required: true,
     },
-    totPrice: {
+    totalPrice: {
         type: Number,
         required: true,
     }

@@ -14,14 +14,16 @@ let headers = [
   { number: 'C', key: 'poNr', value: 'PO Nr', type: 'text' },
   { number: 'D', key: 'artNr', value: 'Art Nr', type: 'text' },
   { number: 'E', key: 'desc', value: 'Description', type: 'text' },
-  { number: 'F', key: 'qty', value: 'Qty', type: 'number' },
-  { number: 'G', key: 'totWeight', value: 'Total Weight', type: 'number' },
-  { number: 'H', key: 'totPrice', value: 'Total Price', type: 'number' },
-  { number: 'I', key: 'insurance', value: 'Insurance', type: 'number' },
-  { number: 'J', key: 'exRate', value: 'Ex Rate', type: 'number' },
-  { number: 'K', key: 'hsCode', value: 'HS Code', type: 'text' },
-  { number: 'L', key: 'hsDesc', value: 'HS Desc', type: 'text' },
-  { number: 'M', key: 'country', value: 'Country', type: 'text' },
+  { number: 'F', key: 'pcs', value: 'Pcs', type: 'number' },
+  { number: 'G', key: 'mtr', value: 'Mtr', type: 'number' },
+  { number: 'H', key: 'totalNetWeight', value: 'Net Weight', type: 'number' },
+  { number: 'I', key: 'totalGrossWeight', value: 'Gross Weight', type: 'number' },
+  { number: 'J', key: 'totalPrice', value: 'Total Price', type: 'number' },
+  { number: 'K', key: 'insurance', value: 'Insurance', type: 'number' },
+  { number: 'L', key: 'exRate', value: 'Ex Rate', type: 'number' },
+  { number: 'M', key: 'hsCode', value: 'HS Code', type: 'text' },
+  { number: 'N', key: 'hsDesc', value: 'HS Desc', type: 'text' },
+  { number: 'O', key: 'country', value: 'Country', type: 'text' },
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
@@ -176,19 +178,25 @@ router.post('/', upload.single('file'), function (req, res) {
           isRejected: true,
           reason: 'Description should not be empty.'
         });
-      } else if (!tempItem.qty) {
+      } else if (!tempItem.pcs) {
         resolve({
           row: row,
           isRejected: true,
-          reason: 'Qty should not be empty.'
+          reason: 'Pcs should not be empty.'
         });
-      } else if (!tempItem.totWeight) {
+      } else if (!tempItem.totalNetWeight) {
         resolve({
           row: row,
           isRejected: true,
-          reason: 'Total Weight should not be empty.'
+          reason: 'Net Weight should not be empty.'
         });
-      } else if (!tempItem.totPrice) {
+      } else if (!tempItem.totalGrossWeight) {
+        resolve({
+          row: row,
+          isRejected: true,
+          reason: 'Gross Weight should not be empty.'
+        });
+      } else if (!tempItem.totalPrice) {
         resolve({
           row: row,
           isRejected: true,
@@ -221,9 +229,7 @@ router.post('/', upload.single('file'), function (req, res) {
       } else {
         
         let insurance = tempItem.insurance || 0;
-        let totPrice = (tempItem.totPrice + insurance) * tempItem.exRate;
-
-        // console.log('unitWeight:', Number(tempItem.totWeight) / Number(qty));
+        let totalPrice = (tempItem.totalPrice + insurance) * tempItem.exRate;
 
         let newItem = new ImportItem({
           srNr: tempItem.srNr,
@@ -231,11 +237,14 @@ router.post('/', upload.single('file'), function (req, res) {
           poNr: tempItem.poNr,
           artNr: tempItem.artNr,
           desc: tempItem.desc,
-          qty: tempItem.qty,
-          unitWeight: tempItem.totWeight / tempItem.qty || 0,
-          totWeight: tempItem.totWeight,
-          unitPrice: totPrice / tempItem.qty || 0,
-          totPrice: totPrice,
+          pcs: tempItem.pcs,
+          mtr: tempItem.mtr || 0,
+          unitNetWeight: tempItem.totalNetWeight / tempItem.pcs || 0,
+          totalNetWeight: tempItem.totalNetWeight,
+          unitGrossWeight: tempItem.totalGrossWeight / tempItem.pcs || 0,
+          totalGrossWeight: tempItem.totalGrossWeight,
+          unitPrice: totalPrice / tempItem.pcs || 0,
+          totalPrice: totalPrice,
           hsCode: tempItem.hsCode,
           hsDesc: tempItem.hsDesc,
           country: tempItem.country,
