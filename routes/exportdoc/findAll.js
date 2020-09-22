@@ -26,6 +26,7 @@ router.post('/', (req, res) => {
                     invNr : { $regex: new RegExp(escape(filter.invNr),'i') },
                     decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
                     boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
+                    currency : { $regex: new RegExp(escape(filter.currency),'i') },
                     $or: [ { boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') } }, { boeDate: { $exists: false } }, { boeDate: null }  ],
                     // boeDateX : { $regex: new RegExp(escape(filter.boeDate),'i') },
                     totalNetWeightX: { $regex: new RegExp(escape(filter.totalNetWeight),'i') },
@@ -43,6 +44,7 @@ router.post('/', (req, res) => {
                     totalNetWeight: 1,
                     totalGrossWeight: 1,
                     totalPrice: 1,
+                    currency: 1,
                     status: { 
                         $cond: {
                             if: { 

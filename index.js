@@ -56,6 +56,7 @@ app.use('/exportdoc/uploadFile', passport.authenticate('jwt', { session: false }
 //exportitem
 app.use('/exportitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/delete'));
 app.use('/exportitem/downloadDuf', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/downloadDuf'));
+app.use('/exportitem/findCandidates', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/findCandidates'));
 app.use('/exportitem/uploadDuf', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/uploadDuf'));
 //importdoc
 app.use('/importdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/create'));
