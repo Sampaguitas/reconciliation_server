@@ -63,6 +63,10 @@ const ImportDocSchema = new Schema({
         type: Boolean,
         default: false
     },
+    fileName: {
+        type: String,
+        default: ''
+    },
     summary: [{
         hsCode: {
             type: String,
@@ -96,11 +100,7 @@ const ImportDocSchema = new Schema({
             type: Number,
             required: true
         },
-    }],
-    fileName: {
-        type: String,
-        default: ''
-    }
+    }]
 });
 
 ImportDocSchema.virtual("items", {

@@ -47,7 +47,16 @@ app.listen(port, () => console.log(`Server running on ${port}`));
 
 //exportdoc
 app.use('/exportdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/create'));
+app.use('/exportdoc/delete', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/delete'));
+app.use('/exportdoc/downloadFile', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/downloadFile'));
 app.use('/exportdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findAll'));
+app.use('/exportdoc/findOne', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findOne'));
+app.use('/exportdoc/update', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/update'));
+app.use('/exportdoc/uploadFile', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/uploadFile'));
+//exportitem
+app.use('/exportitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/delete'));
+app.use('/exportitem/downloadDuf', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/downloadDuf'));
+app.use('/exportitem/uploadDuf', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/uploadDuf'));
 //importdoc
 app.use('/importdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/create'));
 app.use('/importdoc/delete', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/delete'));

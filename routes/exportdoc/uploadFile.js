@@ -10,7 +10,7 @@ const accessKeyId = require('../../config/keys').accessKeyId; //../config/keys
 const secretAccessKey = require('../../config/keys').secretAccessKey;
 const region = require('../../config/keys').region;
 const awsBucketName = require('../../config/keys').awsBucketName;
-const ImportDoc = require('../../models/ImportDoc');
+const ExportDoc = require('../../models/ExportDoc');
 
 aws.config.update({
   accessKeyId: accessKeyId,
@@ -29,7 +29,7 @@ router.post('/', upload.single('file'), function (req, res) {
   } else if (!/(?<=\.)pdf*$/i.test(file.originalname)){
     return res.status(400).json({message: 'Only PDF files can be uploaded.'});
   } else {
-    ImportDoc.findOneAndUpdate({_id: documentId}, {fileName: file.originalname}, {new: true}, function(errDoc, resDoc) {
+    ExportDoc.findOneAndUpdate({_id: documentId}, {fileName: file.originalname}, {new: true}, function(errDoc, resDoc) {
       if (errDoc || !resDoc) {
         return res.status(400).json({message: 'An error has occured.'});
       } else {
@@ -37,7 +37,7 @@ router.post('/', upload.single('file'), function (req, res) {
         var params = {
           Bucket: awsBucketName,
           Body: file.buffer,
-          Key: path.join('import', documentId),
+          Key: path.join('export', documentId),
         }; 
         s3.upload(params, function(err) {
           if (err) {
@@ -49,6 +49,7 @@ router.post('/', upload.single('file'), function (req, res) {
       }
     });
   }
+  
 });
 
 module.exports = router;
