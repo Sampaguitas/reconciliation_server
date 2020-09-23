@@ -47,8 +47,6 @@ router.post('/', (req, res) => {
                     decNr : { $regex: new RegExp(escape(filter.decNr),'i') },
                     boeNr : { $regex: new RegExp(escape(filter.boeNr),'i') },
                     srNrX : { $regex: new RegExp(escape(filter.srNr),'i') },
-                    // country : { $regex: new RegExp(escape(filter.country),'i') },
-                    // hsCode : { $regex: new RegExp(escape(filter.hsCode),'i') },
                     pcsX : { $regex: new RegExp(escape(filter.pcs),'i') },
                     mtrX : { $regex: new RegExp(escape(filter.mtr),'i') },
                     unitNetWeightX : { $regex: new RegExp(escape(filter.unitNetWeight),'i') },
