@@ -21,4 +21,13 @@ const TransactionSchema = new Schema({
     }
 });
 
+TransactionSchema.virtual("importitem", {
+    ref: 'importitems',
+    localField: 'exportId',
+    foreignField: '_id',
+    justOne: true
+});
+
+TransactionSchema.set('toJSON', { virtuals: true });
+
 module.exports= Transaction = mongoose.model('transactions', TransactionSchema);

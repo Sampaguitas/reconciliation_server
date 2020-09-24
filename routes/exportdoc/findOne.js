@@ -24,6 +24,15 @@ router.post('/', (req, res) => {
                 sort: {
                     [!!sort.name ? sort.name : 'srNr']: sort.isAscending === false ? -1 : 1
                 }
+            },
+            populate: {
+                path: 'transactions',
+                populate: {
+                    path: 'importitem',
+                    populate: {
+                        path: 'importdoc'
+                    }
+                }
             }
         })
         .exec(function (err, exportDoc) {
@@ -51,6 +60,9 @@ router.post('/', (req, res) => {
                     let testTotalPrice = regTotalPrice.test(cur.totalPriceX);
                     
                     if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice) {
+                        let importItems = cur.transactions.reduce(function (acc, cur) {
+                            return acc;
+                        }, []);
                         acc.push({
                             _id: cur._id,
                             srNr: cur.srNr,
@@ -63,6 +75,7 @@ router.post('/', (req, res) => {
                             totalGrossWeight: cur.totalGrossWeight,
                             unitPrice: cur.unitPrice,
                             totalPrice: cur.totalPrice,
+                            importItems: importItems,
                         });
                     }
                     return acc;

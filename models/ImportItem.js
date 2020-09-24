@@ -173,6 +173,13 @@ ImportItemSchema.virtual("totalPriceX").get(function() {
     return !_.isUndefined(this.totalPrice) ? this.totalPrice.toString() : "";
 });
 
+ImportItemSchema.virtual("importdoc", {
+    ref: 'importdocs',
+    localField: 'documentId',
+    foreignField: '_id',
+    justOne: true
+});
+
 ImportItemSchema.set('toJSON', { virtuals: true });
 
 module.exports= ImportItem = mongoose.model('importitems', ImportItemSchema);

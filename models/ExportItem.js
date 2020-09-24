@@ -141,6 +141,13 @@ ExportItemSchema.virtual("totalPriceX").get(function() {
     return !_.isUndefined(this.totalPrice) ? this.totalPrice.toString() : "";
 });
 
+ExportItemSchema.virtual("transactions", {
+    ref: 'transactions',
+    localField: '_id',
+    foreignField: 'exportId',
+    justOne: false
+});
+
 ExportItemSchema.set('toJSON', { virtuals: true });
 
 module.exports= ExportItem = mongoose.model('exportitems', ExportItemSchema);
