@@ -70,7 +70,19 @@ const ImportItemSchema = new Schema({
     documentId: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true
-    }
+    },
+    assignedPcs: {
+        type: Number,
+        requied: true
+    },
+    assignedMtr: {
+        type: Number,
+        requied: true
+    },
+    isClosed: {
+        type: Boolean,
+        default: false
+    },
 });
 
 ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function(doc, next) {
@@ -120,10 +132,15 @@ ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                     found.totalGrossWeight += cur.totalGrossWeight;
                     found.totalPrice += cur.totalPrice;
                 }
+                acc.assignedPcs += cur.assignedPcs || 0;
+                acc.assigendMtr += cur.assigendMtr || 0;
+                if (!!acc.closed && (cur.assigendPcs < cur.pcs || cur.assigendMtr < cur.mtr)) {
+                    acc.closed = false
+                }
                 return acc;
-            }, { invNrs: "", poNrs: "", pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [] });
-            let { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary } = totals;
-            let update = { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary };
+            }, { invNrs: "", poNrs: "", pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [], assignedPcs: 0, assignedMtr: 0, closed: true });
+            let { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, closed } = totals;
+            let update = { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, closed };
             let options = { new: true };
             mongoose.model('importdocs').findByIdAndUpdate(documentId, update, options, function (errDoc, resDoc) {
                 if (!!errDoc || !resDoc) {

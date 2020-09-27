@@ -34,7 +34,9 @@ router.post('/', (req, res) => {
                     totalGrossWeight: 0,
                     totalPrice: 0,
                     summary: [],
-                    isClosed: false
+                    assignedPcs: 0,
+                    assigendMtr: 0,
+                    isClosed: false,
                 });
 
                 newDocument.save()

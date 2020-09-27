@@ -46,60 +46,71 @@ const ExportItemSchema = new Schema({
     documentId: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true
+    },
+    assignedPcs: {
+        type: Number,
+        requied: true
+    },
+    assignedMtr: {
+        type: Number,
+        requied: true
+    },
+    isClosed: {
+        type: Boolean,
+        default: false
     }
 });
 
 ExportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function(doc, next) {
     let documentId = doc.documentId;
-    mongoose.model('exportitems').find({ documentId: documentId }, function(errItems, resItems) {
+    mongoose.model('exportitems')
+    .find({ documentId: documentId })
+    .populate({
+        path: 'transactions',
+        populate: {
+            path: 'importitem'
+        }
+    })
+    .exec(function(errItems, resItems) {
         if (!!errItems || !resItems) {
             next();
         } else {
             let totals = resItems.reduce(function(acc, cur) {
-                // if (!!cur.invNr && !acc.invNrs.includes(cur.invNr)) {
-                //     if(acc.invNrs == "") {
-                //         acc.invNrs = cur.invNr
-                //     } else {
-                //         acc.invNrs += `| ${cur.invNr}`
-                //     }
-                // }
-                // if (!!cur.poNr && !acc.poNrs.includes(cur.poNr)) {
-                //     if(acc.poNrs == "") {
-                //         acc.poNrs = cur.poNr
-                //     } else {
-                //         acc.poNrs += `| ${cur.poNr}`
-                //     }
-                // }
                 acc.pcs += cur.pcs || 0;
                 acc.mtr += cur.mtr || 0;
                 acc.totalNetWeight += cur.totalNetWeight || 0;
                 acc.totalGrossWeight += cur.totalGrossWeight || 0;
                 acc.totalPrice += cur.totalPrice || 0;
-                // let found = acc.summary.find(element => _.isEqual(element.hsCode, cur.hsCode) && _.isEqual(element.country, cur.country) && _.isEqual(element.hsDesc, cur.hsDesc));
-                // if (_.isUndefined(found)) {
-                //     acc.summary.push({
-                //         hsCode: cur.hsCode,
-                //         hsDesc: cur.hsDesc,
-                //         country: cur.country,
-                //         pcs: cur.pcs,
-                //         mtr: !!cur.mtr ? cur.mtr : 0,
-                //         totalNetWeight: cur.totalNetWeight,
-                //         totalGrossWeight: cur.totalGrossWeight,
-                //         totalPrice: cur.totalPrice,
-                //     });
-                // } else {
-                //     found.pcs += cur.pcs;
-                //     if (!!cur.mtr) {
-                //         found.mtr += cur.mtr;
-                //     };
-                //     found.totalNetWeight += cur.totalNetWeight,
-                //     found.totalGrossWeight += cur.totalGrossWeight;
-                //     found.totalPrice += cur.totalPrice;
-                // }
+                cur.transactions.forEach(transaction => {
+                    let found = acc.summary.find(element => _.isEqual(element.hsCode, transaction.importitem.hsCode) && _.isEqual(element.country, transaction.importitem.country) && _.isEqual(element.hsDesc, transaction.importitem.hsDesc));
+                    if (_.isUndefined(found)) {
+                        acc.summary.push({
+                            hsCode: transaction.importitem.hsCode,
+                            hsDesc: transaction.importitem.hsDesc,
+                            country: transaction.importitem.country,
+                            pcs: transaction.pcs || 0,
+                            mtr: !!transaction.mtr ? transaction.mtr : 0,
+                            totalNetWeight: transaction.importitem.unitNetWeight * transaction.pcs || 0,
+                            totalGrossWeight: transaction.importitem.unitGrossWeight * transaction.pcs || 0,
+                            totalPrice: cur.unitPrice * transaction.pcs,
+                        });
+                    } else {
+                        found.pcs += transaction.pcs || 0;
+                        found.mtr += transaction.mtr || 0;
+                        found.totalNetWeight += (transaction.importitem.unitNetWeight * transaction.pcs) || 0;
+                        found.totalGrossWeight += transaction.importitem.unitGrossWeight * transaction.pcs || 0;
+                        found.totalPrice += cur.unitPrice * transaction.pcs;
+                    }
+                });
+                acc.assignedPcs += cur.assignedPcs || 0;
+                acc.assignedMtr += cur.assignedMtr || 0;
+                if (!!acc.closed && (cur.assigendPcs < cur.pcs || cur.assignedMtr < cur.mtr)) {
+                    acc.closed = false
+                }
                 return acc;
-            }, { pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [] });
-            let { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary } = totals;
-            let update = { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary };
+            }, { pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [], assignedPcs: 0, assignedMtr: 0, closed: true });
+            let { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, closed } = totals;
+            let update = { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, closed };
             let options = { new: true };
             mongoose.model('exportdocs').findByIdAndUpdate(documentId, update, options, function (errDoc, resDoc) {
                 if (!!errDoc || !resDoc) {

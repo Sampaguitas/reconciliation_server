@@ -248,7 +248,10 @@ router.post('/', upload.single('file'), function (req, res) {
           hsCode: tempItem.hsCode,
           hsDesc: tempItem.hsDesc,
           country: tempItem.country,
-          documentId: documentId
+          documentId: documentId,
+          assignedPcs: 0,
+          assigendMtr: 0,
+          isClosed: false,
         });
 
         newItem.save()

@@ -58,6 +58,14 @@ const ExportDocSchema = new Schema({
         type: Number,
         default: 0,
     },
+    assignedPcs: {
+        type: Number,
+        requied: true
+    },
+    assignedMtr: {
+        type: Number,
+        requied: true
+    },
     isClosed: {
         type: Boolean,
         default: false

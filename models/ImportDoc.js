@@ -59,6 +59,14 @@ const ImportDocSchema = new Schema({
         type: String,
         default: "",
     },
+    assignedPcs: {
+        type: Number,
+        requied: true
+    },
+    assignedMtr: {
+        type: Number,
+        requied: true
+    },
     isClosed: {
         type: Boolean,
         default: false

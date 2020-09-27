@@ -21,8 +21,78 @@ const TransactionSchema = new Schema({
     }
 });
 
+TransactionSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function(doc, next) {
+    let importId = doc.importId;
+    mongoose.model('transactions')
+    .find({ importId: importId })
+    .populate('importitem')
+    .exec(function(errTransactions, resTransactions) {
+        if (!!errTransactions || !resTransactions) {
+            next();
+        } else {
+            let totals = resTransactions.reduce(function(acc, cur) {
+                acc.assignedPcs += cur.pcs || 0;
+                acc.assigendMtr += cur.mtr || 0;
+                if (acc.assignedPcs >= cur.importitem.pcs && acc.assigendMtr >= cur.importitem.mtr) {
+                    acc.isClosed = true
+                }
+                return acc;
+            }, { assignedPcs: 0, assignedMtr: 0, isClosed: false });
+            let { assignedPcs, assignedMtr, isClosed } = totals;
+            let update = { assignedPcs, assignedMtr, isClosed };
+            let options = { new: true };
+            mongoose.model('importitems').findByIdAndUpdate(importId, update, options, function (errDoc, resDoc) {
+                if (!!errDoc || !resDoc) {
+                    next();
+                } else {
+                    next();
+                }
+            });
+        }
+    });
+});
+
+TransactionSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function(doc, next) {
+    let exportId = doc.exportId;
+    mongoose.model('transactions')
+    .find({ exportId: exportId })
+    .populate('exportitem')
+    .exec(function(errTransactions, resTransactions) {
+        if (!!errTransactions || !resTransactions) {
+            next();
+        } else {
+            let totals = resTransactions.reduce(function(acc, cur) {
+                acc.assignedPcs += cur.pcs || 0;
+                acc.assigendMtr += cur.mtr || 0;
+                if (acc.assignedPcs >= cur.exportitem.pcs && acc.assigendMtr >= cur.exportitem.mtr) {
+                    acc.isClosed = true
+                }
+                return acc;
+
+            }, { assignedPcs: 0, assignedMtr: 0, isClosed: false });
+            let { assignedPcs, assignedMtr, isClosed } = totals;
+            let update = { assignedPcs, assignedMtr, isClosed };
+            let options = { new: true };
+            mongoose.model('exportitems').findByIdAndUpdate(exportId, update, options, function (errDoc, resDoc) {
+                if (!!errDoc || !resDoc) {
+                    next();
+                } else {
+                    next();
+                }
+            });
+        }
+    });
+});
+
 TransactionSchema.virtual("importitem", {
     ref: 'importitems',
+    localField: 'importId',
+    foreignField: '_id',
+    justOne: true
+});
+
+TransactionSchema.virtual("exportitem", {
+    ref: 'exportitems',
     localField: 'exportId',
     foreignField: '_id',
     justOne: true

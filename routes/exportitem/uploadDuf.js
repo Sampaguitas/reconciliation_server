@@ -190,7 +190,10 @@ router.post('/', upload.single('file'), function (req, res) {
           totalGrossWeight: 0,
           unitPrice: tempItem.totalPrice / tempItem.pcs || 0,
           totalPrice: tempItem.totalPrice,
-          documentId: documentId
+          documentId: documentId,
+          assignedPcs: 0,
+          assigendMtr: 0,
+          isClosed: false,
         });
 
         newItem.save()
