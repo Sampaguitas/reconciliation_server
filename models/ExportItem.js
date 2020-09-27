@@ -89,7 +89,7 @@ ExportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                             hsDesc: transaction.importitem.hsDesc,
                             country: transaction.importitem.country,
                             pcs: transaction.pcs || 0,
-                            mtr: !!transaction.mtr ? transaction.mtr : 0,
+                            mtr: transaction.mtr || 0,
                             totalNetWeight: transaction.importitem.unitNetWeight * transaction.pcs || 0,
                             totalGrossWeight: transaction.importitem.unitGrossWeight * transaction.pcs || 0,
                             totalPrice: cur.unitPrice * transaction.pcs,
@@ -104,13 +104,13 @@ ExportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                 });
                 acc.assignedPcs += cur.assignedPcs || 0;
                 acc.assignedMtr += cur.assignedMtr || 0;
-                if (!!acc.closed && (cur.assigendPcs < cur.pcs || cur.assignedMtr < cur.mtr)) {
-                    acc.closed = false
+                if (!acc.isClosed && acc.assignedPcs >= cur.pcs && acc.assignedMtr >= cur.mtr) {
+                    acc.isClosed = true
                 }
                 return acc;
-            }, { pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [], assignedPcs: 0, assignedMtr: 0, closed: true });
-            let { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, closed } = totals;
-            let update = { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, closed };
+            }, { pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [], assignedPcs: 0, assignedMtr: 0, isClosed: false });
+            let { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, isClosed } = totals;
+            let update = { pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, isClosed };
             let options = { new: true };
             mongoose.model('exportdocs').findByIdAndUpdate(documentId, update, options, function (errDoc, resDoc) {
                 if (!!errDoc || !resDoc) {

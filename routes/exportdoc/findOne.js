@@ -64,9 +64,9 @@ router.post('/', (req, res) => {
                     let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
                     if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr) {
-                        let importItems = cur.transactions.reduce(function (accItems, curItems) {
-                            return acc;
-                        }, []);
+                        // let importItems = cur.transactions.reduce(function (accItems, curItems) {
+                        //     return acc;
+                        // }, []);
                         acc.push({
                             _id: cur._id,
                             srNr: cur.srNr,
@@ -81,7 +81,7 @@ router.post('/', (req, res) => {
                             totalGrossWeight: cur.totalGrossWeight,
                             unitPrice: cur.unitPrice,
                             totalPrice: cur.totalPrice,
-                            importItems: importItems,
+                            importItems: [],
                             remainingPcs: cur.remainingPcs,
                             remainingMtr: cur.remainingMtr,
                         });

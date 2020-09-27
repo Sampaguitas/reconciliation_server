@@ -12,31 +12,39 @@ router.post('/', (req, res) => {
         return res.status(400).json({ message: 'importId is required.' });
     } else if (!exportId) {
         return res.status(400).json({ message: 'exportId is required.' });
-    // } else if (!qty) {
-    //     return res.status(400).json({ message: 'qty is required.' });
-    // } else if (!mtr) {
-    //     return res.status(400).json({ message: 'mtr is required.' });
-    // } else {
-    //     conditions = { importId, exportId };
-    //     update = { $inc: { qty, mtr } };
-    //     options = { new: true, upsert: true };
-    //     Transaction.findOneAndUpdate(conditions, update, options, function(err, doc) {
-    //         if (err) {
-    //             return res.status(400).json({ message: 'An error has occured.' });
-    //         } else if (!doc) {
-    //             return res.status(400).json({ message: 'transaction could not be created.' });
-    //         } else {
-    //             return res.status(200).json({ message: 'Transaction successfully created.' });
-    //         }
-    //     });
-    // }
     } else {
-        ExportItem.findById(exportId, function(err, exportitem) {
-            if (err) {
-                res.status(400).json({message: 'Could not retreive item information.'});
+        ExportItem.findById(exportId, function(errExport, exportitem) {
+            if (!!errExport || !exportitem) {
+                res.status(400).json({message: 'Could not retreive exportItem information.'});
             } else {
-                console.log('exportitem:', exportitem);
-                res.status(200).json({message: 'toto.'});
+                ImportItem.findById(importId, function(errImport, importitem) {
+                    if (!!errImport || !importitem) {
+                        res.status(400).json({message: 'Could not retreive impotItem information.'});
+                    } else {
+                        let exportRemPcs = Math.max(exportitem.pcs - (exportitem.assignedPcs || 0), 0);
+                        let exportRemMtr = Math.max(exportitem.mtr - (exportitem.assignedMtr || 0), 0);
+                        let importRemPcs = Math.max(importitem.pcs - (importitem.assignedPcs || 0), 0);
+                        let importRemMtr = Math.max(importitem.mtr - (importitem.assignedMtr || 0), 0);
+                        let pcs = Math.min(exportRemPcs, importRemPcs);
+                        let mtr = Math.min(exportRemMtr, importRemMtr);
+                        // console.log('pcs:', pcs);
+                        // console.log('mtr:', mtr);
+                        // res.status(200).json({message: `pcs: ${pcs}, mtr: ${mtr}`});
+                        let conditions = { importId, exportId };
+                        let update = { $inc: { pcs, mtr } };
+                        options = { new: true, upsert: true };
+                        
+                        Transaction.findOneAndUpdate(conditions, update, options, function(err, doc) {
+                            if (err) {
+                                return res.status(400).json({ message: 'An error has occured.' });
+                            } else if (!doc) {
+                                return res.status(400).json({ message: 'transaction could not be created.' });
+                            } else {
+                                return res.status(200).json({ message: 'Transaction successfully created.' });
+                            }
+                        });
+                    }
+                });
             }
         })
     }
