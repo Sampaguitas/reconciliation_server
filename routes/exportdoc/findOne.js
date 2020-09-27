@@ -48,6 +48,8 @@ router.post('/', (req, res) => {
                 let regGrossWeigth = new RegExp(escape(filter.totalGrossWeight), 'i');
                 let regUnitPrice = new RegExp(escape(filter.unitPrice), 'i');
                 let regTotalPrice = new RegExp(escape(filter.totalPrice), 'i');
+                let regRemPcs = new RegExp(escape(filter.remainingPcs), 'i');
+                let regRemMtr = new RegExp(escape(filter.remainingMtr), 'i');
                 
                 let filtered = exportDoc.items.reduce(function(acc, cur) {
                     
@@ -58,9 +60,11 @@ router.post('/', (req, res) => {
                     let testGrossWeigth = regGrossWeigth.test(cur.totalGrossWeightX);
                     let testUnitPrice = regUnitPrice.test(cur.unitPriceX);
                     let testTotalPrice = regTotalPrice.test(cur.totalPriceX);
+                    let testRemPcs = regRemPcs.test(cur.remainingPcsX);
+                    let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
-                    if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice) {
-                        let importItems = cur.transactions.reduce(function (acc, cur) {
+                    if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr) {
+                        let importItems = cur.transactions.reduce(function (accItems, curItems) {
                             return acc;
                         }, []);
                         acc.push({
@@ -70,12 +74,16 @@ router.post('/', (req, res) => {
                             desc: cur.desc,
                             poNr: cur.poNr,
                             pcs: cur.pcs,
+                            remainingPcs: cur.remainingPcs,
+                            remainingMtr: cur.remainingMtr,
                             mtr: cur.mtr,
                             totalNetWeight: cur.totalNetWeight,
                             totalGrossWeight: cur.totalGrossWeight,
                             unitPrice: cur.unitPrice,
                             totalPrice: cur.totalPrice,
                             importItems: importItems,
+                            remainingPcs: cur.remainingPcs,
+                            remainingMtr: cur.remainingMtr,
                         });
                     }
                     return acc;

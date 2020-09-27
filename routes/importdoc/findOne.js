@@ -42,6 +42,8 @@ router.post('/', (req, res) => {
                 let regGrossWeigth = new RegExp(escape(filter.totalGrossWeight), 'i');
                 let regUnitPrice = new RegExp(escape(filter.unitPrice), 'i');
                 let regTotalPrice = new RegExp(escape(filter.totalPrice), 'i');
+                let regRemPcs = new RegExp(escape(filter.remainingPcs), 'i');
+                let regRemMtr = new RegExp(escape(filter.remainingMtr), 'i');
                 
                 let filtered = importDoc.items.reduce(function(acc, cur) {
                     
@@ -52,8 +54,10 @@ router.post('/', (req, res) => {
                     let testTotWeigth = regGrossWeigth.test(cur.totalGrossWeightX);
                     let testUnitPrice = regUnitPrice.test(cur.unitPriceX);
                     let testTotalPrice = regTotalPrice.test(cur.totalPriceX);
+                    let testRemPcs = regRemPcs.test(cur.remainingPcsX);
+                    let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
-                    if (testSrNr && testPcs && testMtr && testNetWeigth && testTotWeigth && testUnitPrice && testTotalPrice) {
+                    if (testSrNr && testPcs && testMtr && testNetWeigth && testTotWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr) {
                         acc.push({
                             _id: cur._id,
                             srNr: cur.srNr,
@@ -69,6 +73,8 @@ router.post('/', (req, res) => {
                             totalPrice: cur.totalPrice,
                             hsCode: cur.hsCode,
                             country: cur.country,
+                            remainingPcs: cur.remainingPcs,
+                            remainingMtr: cur.remainingMtr,
                         });
                     }
                     return acc;

@@ -166,6 +166,22 @@ ImportItemSchema.virtual("mtrX").get(function() {
     return !_.isUndefined(this.mtr) ? this.mtr.toString() : "";
 });
 
+ImportItemSchema.virtual("remainingPcs").get(function() {
+    return (this.pcs || 0) - (this.assignedPcs || 0);
+});
+
+ImportItemSchema.virtual("remainingMtr").get(function() {
+    return (this.mtr || 0) - (this.assignedMtr || 0);
+});
+
+ImportItemSchema.virtual("remainingPcsX").get(function() {
+    return ((this.pcs || 0) - (this.assignedPcs || 0)).toString();
+});
+
+ImportItemSchema.virtual("remainingMtrX").get(function() {
+    return ((this.mtr || 0) - (this.assignedMtr || 0)).toString();
+});
+
 // ImportItemSchema.virtual("unitNetWeightX").get(function() {
 //     return !_.isUndefined(this.unitNetWeight) ? this.unitNetWeight.toString() : "";
 // });
