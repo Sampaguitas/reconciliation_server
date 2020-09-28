@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
                     totalPrice: 0,
                     summary: [],
                     assignedPcs: 0,
-                    assigendMtr: 0,
+                    assignedMtr: 0,
                     isClosed: false,
                 });
 

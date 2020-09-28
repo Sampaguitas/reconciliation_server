@@ -192,7 +192,7 @@ router.post('/', upload.single('file'), function (req, res) {
           totalPrice: tempItem.totalPrice,
           documentId: documentId,
           assignedPcs: 0,
-          assigendMtr: 0,
+          assignedMtr: 0,
           isClosed: false,
         });
 
