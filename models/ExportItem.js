@@ -170,6 +170,13 @@ ExportItemSchema.virtual("totalPriceX").get(function() {
     return !_.isUndefined(this.totalPrice) ? this.totalPrice.toString() : "";
 });
 
+ExportItemSchema.virtual("exportdoc", {
+    ref: 'exportdocs',
+    localField: 'documentId',
+    foreignField: '_id',
+    justOne: true
+});
+
 ExportItemSchema.virtual("transactions", {
     ref: 'transactions',
     localField: '_id',

@@ -92,6 +92,7 @@ router.post('/', (req, res) => {
                         sfiNr: importDoc.sfiNr,
                         boeDate: importDoc.boeDate,
                         pcs: importDoc.pcs,
+                        totalNetWeight: importDoc.totalNetWeight,
                         totalGrossWeight: importDoc.totalGrossWeight,
                         totalPrice: importDoc.totalPrice,
                         isClosed: importDoc.isClosed,

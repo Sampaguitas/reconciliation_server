@@ -13,13 +13,18 @@ router.post('/', (req, res) => {
     } else if (!exportId) {
         return res.status(400).json({ message: 'exportId is required.' });
     } else {
-        ExportItem.findById(exportId, function(errExport, exportitem) {
+        ExportItem
+        .findById(exportId)
+        .populate('exportdoc')
+        .exec(function(errExport, exportitem) {
             if (!!errExport || !exportitem) {
                 res.status(400).json({message: 'Could not retreive exportItem information.'});
             } else {
                 ImportItem.findById(importId, function(errImport, importitem) {
                     if (!!errImport || !importitem) {
                         res.status(400).json({message: 'Could not retreive impotItem information.'});
+                    } else if ( (importitem.unitPrice / (exportitem.exportdoc.exRate || 1) ) > exportitem.unitPrice ){
+                        res.status(400).json({message: 'Export value should not be less than the import value.'});
                     } else {
                         let exportRemPcs = Math.max(exportitem.pcs - (exportitem.assignedPcs || 0), 0);
                         let exportRemMtr = Math.max(exportitem.mtr - (exportitem.assignedMtr || 0), 0);
@@ -47,7 +52,7 @@ router.post('/', (req, res) => {
                     }
                 });
             }
-        })
+        });
     }
 });
 
