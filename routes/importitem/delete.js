@@ -4,7 +4,9 @@ const ImportItem = require('../../models/ImportItem');
 const _ = require('lodash');
 
 router.delete('/', async (req, res) => {
+
     const selectedIds = req.body.selectedIds;
+    
     let myPromises = [];
     let nRejected = 0;
     let nDeleted = 0;

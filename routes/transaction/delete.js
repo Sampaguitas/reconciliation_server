@@ -4,24 +4,46 @@ const Transaction = require('../../models/Transaction');
 const _ = require('lodash');
 
 router.delete('/', async (req, res) => {
-    
-    const transactionId = req.body.transactionId;
 
-    if (_.isEmpty(transactionId)) {
-        return res.status(400).json({message: 'transactionId is missing.'});
+    const selectedIds = req.body.selectedIds;
+    
+    let myPromises = [];
+    let nRejected = 0;
+    let nDeleted = 0;
+
+    if (_.isEmpty(selectedIds)) {
+        return res.status(400).json({message: 'Select lines to be deleted.'});
     } else if(!req.user.isAdmin){
-        return res.status(400).json({ message: 'You are not authorised to delete transactions.' });
+        return res.status(400).json({ message: 'You are not authorised to unlink items.' });
     } else {
-        Transaction.findByIdAndDelete(transactionId, function (err, doc) {
-            if (!!err) {
-                return res.status(400).json({message: 'An error has occured.'});
-            } else if (!doc) {
-                return res.status(400).json({message: 'transaction could not be deleted.'});
-            } else {
-                return res.status(400).json({message: 'transaction has successfully been deleted.'});
-            }
+        selectedIds.map(selectedId => myPromises.push(removeTransaction(selectedId)));
+        await Promise.all(myPromises).then(resPromises => {
+            resPromises.map(resPromise => {
+                if (resPromise.isRejected) {
+                    nRejected++;
+                } else {
+                    nDeleted++;
+                }
+            });
+            res.status(!!nRejected ? 400 : 200).json({message: `${nDeleted} item(s) unlinked, ${nRejected} item(s) rejected.`});
         });
     }
 });
+
+function removeTransaction(selectedId) {
+    return new Promise(function(resolve) {
+        Transaction.findByIdAndDelete(selectedId, function (err) {
+            if (err) {
+                resolve({
+                    isRejected: true
+                });
+            } else {
+                resolve({
+                    isRejected: false
+                });
+            }
+        });
+    });
+}
 
 module.exports = router;
