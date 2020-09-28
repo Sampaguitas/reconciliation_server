@@ -56,7 +56,14 @@ TransactionSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], functio
     let exportId = doc.exportId;
     mongoose.model('transactions')
     .find({ exportId: exportId })
-    .populate('exportitem')
+    .populate([
+        {
+            path: 'exportitem'
+        },
+        {
+            path: 'importitem'
+        }
+    ])
     .exec(function(errTransactions, resTransactions) {
         if (!!errTransactions || !resTransactions) {
             next();
@@ -64,13 +71,15 @@ TransactionSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], functio
             let totals = resTransactions.reduce(function(acc, cur) {
                 acc.assignedPcs += cur.pcs;
                 acc.assignedMtr += cur.mtr;
+                acc.totalNetWeight += cur.importitem.totalNetWeight;
+                acc.totalGrossWeight += cur.importitem.totalGrossWeight;
                 if (!acc.isClosed && acc.assignedPcs >= cur.exportitem.pcs && acc.assignedMtr >= cur.exportitem.mtr) {
                     acc.isClosed = true
                 }
                 return acc;
-            }, { assignedPcs: 0, assignedMtr: 0, isClosed: false });
-            let { assignedPcs, assignedMtr, isClosed } = totals;
-            let update = { assignedPcs, assignedMtr, isClosed };
+            }, { assignedPcs: 0, assignedMtr: 0, totalNetWeight: 0, totalGrossWeight: 0, isClosed: false });
+            let { assignedPcs, assignedMtr, totalNetWeight, totalGrossWeight, isClosed } = totals;
+            let update = { assignedPcs, assignedMtr, totalNetWeight, totalGrossWeight, isClosed };
             let options = { new: true };
             mongoose.model('exportitems').findByIdAndUpdate(exportId, update, options, function (errDoc, resDoc) {
                 if (!!errDoc || !resDoc) {

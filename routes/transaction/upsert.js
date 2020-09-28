@@ -27,22 +27,23 @@ router.post('/', (req, res) => {
                         let importRemMtr = Math.max(importitem.mtr - (importitem.assignedMtr || 0), 0);
                         let pcs = Math.min(exportRemPcs, importRemPcs);
                         let mtr = Math.min(exportRemMtr, importRemMtr);
-                        // console.log('pcs:', pcs);
-                        // console.log('mtr:', mtr);
-                        // res.status(200).json({message: `pcs: ${pcs}, mtr: ${mtr}`});
-                        let conditions = { importId, exportId };
-                        let update = { $inc: { pcs, mtr } };
-                        options = { new: true, upsert: true };
-                        
-                        Transaction.findOneAndUpdate(conditions, update, options, function(err, doc) {
-                            if (err) {
-                                return res.status(400).json({ message: 'An error has occured.' });
-                            } else if (!doc) {
-                                return res.status(400).json({ message: 'transaction could not be created.' });
-                            } else {
-                                return res.status(200).json({ message: 'Transaction successfully created.' });
-                            }
-                        });
+                        if (pcs == 0 && mtr == 0) {
+                            return res.status(400).json({ message: 'It seems that all quantities have already been imported.'});
+                        } else {
+                            let conditions = { importId, exportId };
+                            let update = { $inc: { pcs, mtr } };
+                            options = { new: true, upsert: true };
+                            
+                            Transaction.findOneAndUpdate(conditions, update, options, function(err, doc) {
+                                if (err) {
+                                    return res.status(400).json({ message: 'An error has occured.' });
+                                } else if (!doc) {
+                                    return res.status(400).json({ message: 'transaction could not be created.' });
+                                } else {
+                                    return res.status(200).json({ message: 'Transaction successfully created.' });
+                                }
+                            });
+                        }
                     }
                 });
             }
