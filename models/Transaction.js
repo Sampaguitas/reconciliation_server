@@ -32,8 +32,8 @@ TransactionSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], functio
         } else {
             let totals = resTransactions.reduce(function(acc, cur) {
                 acc.assignedPcs += cur.pcs;
-                acc.assigendMtr += cur.mtr;
-                if (acc.assignedPcs >= cur.importitem.pcs && acc.assigendMtr >= cur.importitem.mtr) {
+                acc.assignedMtr += cur.mtr;
+                if (acc.assignedPcs >= cur.importitem.pcs && acc.assignedMtr >= cur.importitem.mtr) {
                     acc.isClosed = true
                 }
                 return acc;
@@ -63,8 +63,8 @@ TransactionSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], functio
         } else {
             let totals = resTransactions.reduce(function(acc, cur) {
                 acc.assignedPcs += cur.pcs;
-                acc.assigendMtr += cur.mtr;
-                if (acc.assignedPcs >= cur.exportitem.pcs && acc.assigendMtr >= cur.exportitem.mtr) {
+                acc.assignedMtr += cur.mtr;
+                if (acc.assignedPcs >= cur.exportitem.pcs && acc.assignedMtr >= cur.exportitem.mtr) {
                     acc.isClosed = true
                 }
                 return acc;
