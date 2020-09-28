@@ -64,9 +64,22 @@ router.post('/', (req, res) => {
                     let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
                     if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr) {
-                        // let importItems = cur.transactions.reduce(function (accItems, curItems) {
-                        //     return acc;
-                        // }, []);
+                        let tempArray = cur.transactions.reduce(function (accTransaction, curTransaction) {
+                            accTransaction.push({
+                                _id: curTransaction._id,
+                                decNr: curTransaction.importitem.importdoc.decNr,
+                                boeNr: curTransaction.importitem.importdoc.boeNr,
+                                srNr: curTransaction.importitem.srNr,
+                                country: curTransaction.importitem.country,
+                                hsCode: curTransaction.importitem.hsCode,
+                                pcs: curTransaction.pcs,
+                                mtr: curTransaction.mtr,
+                                unitNetWeight: curTransaction.importitem.unitNetWeight,
+                                unitGrossWeight: curTransaction.importitem.unitGrossWeight,
+                                unitPrice: curTransaction.importitem.unitPrice / (exportDoc.exRate || 1),
+                            })
+                            return accTransaction;
+                        }, []);
                         acc.push({
                             _id: cur._id,
                             srNr: cur.srNr,
@@ -81,7 +94,7 @@ router.post('/', (req, res) => {
                             totalGrossWeight: cur.totalGrossWeight,
                             unitPrice: cur.unitPrice,
                             totalPrice: cur.totalPrice,
-                            importItems: [],
+                            importItems: tempArray,
                             remainingPcs: cur.remainingPcs,
                             remainingMtr: cur.remainingMtr,
                         });
