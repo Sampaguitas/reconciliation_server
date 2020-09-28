@@ -35,11 +35,33 @@ router.post('/', (req, res) => {
                     decNr: { $ifNull: [ { $arrayElemAt: ["$importdocs.decNr", 0] }, ""] },
                     boeNr: { $ifNull: [ { $arrayElemAt: ["$importdocs.boeNr", 0] }, ""] },
                     srNrX: { $toString: "$srNr" },
+                    tempPcs: { $subtract: ["$pcs", { $ifNull: ["$assignedPcs", 0] } ] },
+                    tempMtr: { $subtract: ["$pcs", { $ifNull: ["$assignedPcs", 0] } ] },
                     pcsX: { $toString: { $subtract: ["$pcs", { $ifNull: ["$assignedPcs", 0] } ] } },
                     mtrX: { $toString: { $subtract: ["$mtr", { $ifNull: ["$assignedMtr", 0] } ] } },
                     unitNetWeightX: { $toString: "$unitNetWeight" },
                     unitGrossWeightX: { $toString: "$unitGrossWeight" },
                     fPriceX: { $toString: { $divide: ["$unitPrice", exRate] } },
+                    linked: {
+                        $cond: {
+                            if: {
+                                $and: [
+                                    {
+                                        $lte: [
+                                            { $subtract: ["$pcs", { $ifNull: ["$assignedPcs", 0] } ] },
+                                            0
+                                        ]
+                                    },
+                                    {
+                                        $lte: [
+                                            { $subtract: ["$mtr", { $ifNull: ["$assignedMtr", 0] } ] },
+                                            0
+                                        ]
+                                    }
+                                ]
+                            }, then: true, else: false 
+                        } 
+                    }
                 }
             },
             {
@@ -52,6 +74,7 @@ router.post('/', (req, res) => {
                     unitNetWeightX : { $regex: new RegExp(escape(filter.unitNetWeight),'i') },
                     unitGrossWeightX : { $regex: new RegExp(escape(filter.unitGrossWeight),'i') },
                     fPriceX : { $regex: new RegExp(escape(filter.unitPrice),'i') },
+                    linked: false,
                 }
             },
             {

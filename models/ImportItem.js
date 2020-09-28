@@ -134,11 +134,11 @@ ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                 }
                 acc.assignedPcs += cur.assignedPcs || 0;
                 acc.assignedMtr += cur.assignedMtr || 0;
-                if (!acc.isClosed && acc.assignedPcs >= cur.pcs && acc.assignedMtr >= cur.mtr) {
-                    acc.isClosed = true
+                if (!!acc.isClosed && (cur.assignedPcs < cur.pcs || cur.assignedMtr < cur.mtr)) {
+                    acc.isClosed = false
                 }
                 return acc;
-            }, { invNrs: "", poNrs: "", pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [], assignedPcs: 0, assignedMtr: 0, isClosed: false });
+            }, { invNrs: "", poNrs: "", pcs: 0, mtr: 0, totalNetWeight: 0, totalGrossWeight: 0, totalPrice: 0, summary: [], assignedPcs: 0, assignedMtr: 0, isClosed: true });
             let { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, isClosed } = totals;
             let update = { invNrs, poNrs, pcs, mtr, totalNetWeight, totalGrossWeight, totalPrice, summary, assignedPcs, assignedMtr, isClosed };
             let options = { new: true };
