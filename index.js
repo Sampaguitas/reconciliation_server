@@ -86,4 +86,3 @@ app.use('/user/updatePwd', passport.authenticate('jwt', { session: false }), req
 app.use('/transaction/delete', passport.authenticate('jwt', { session: false }), require('./routes/transaction/delete'));
 app.use('/transaction/update', passport.authenticate('jwt', { session: false }), require('./routes/transaction/update'));
 app.use('/transaction/upsert', passport.authenticate('jwt', { session: false }), require('./routes/transaction/upsert'));
-//user

@@ -3,21 +3,23 @@ const router = express.Router();
 const Transaction = require('../../models/Transaction');
 
 router.put('/', (req, res) => {
-    const { _id, fieldValue, fieldName  } = req.body;
+    const { _id, pcs, mtr  } = req.body;
     if (!_id) {
-        return res.status(400).json({ message: 'documentId is required.'});
+        return res.status(400).json({ message: 'transactionId is missing.'});
+    } else if (!pcs){
+        return res.status(400).json({ message: 'Pcs should not be empty.'});
     } else {
         let filter = { _id };
-        let update = { [`${fieldValue}`]: fieldName };
+        let update = { pcs, mtr };
         let options = { new: true };
     
-        Transaction.findOneAndUpdate(filter, update, options, function (err, exportDoc) {
+        Transaction.findOneAndUpdate(filter, update, options, function (err, transaction) {
             if (err) {
                 return res.status(400).json({ message: 'An error has occured.'});
-            } else if (!exportDoc) {
-                return res.status(400).json({ message: 'transaction could not be updated.'});
+            } else if (!transaction) {
+                return res.status(400).json({ message: 'Quantities could not be updated.'});
             } else {
-                return res.status(200).json({ message: 'transaction has successfully been updated.' });
+                return res.status(200).json({ message: 'Quantities have successfully been updated.' });
             }
         });
     }
