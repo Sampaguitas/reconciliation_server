@@ -85,6 +85,45 @@ const ImportItemSchema = new Schema({
     },
 });
 
+ImportItemSchema.post('findOneAndDelete', function(doc, next) {
+    let importId = doc._id;
+    findTransactions(importId).then( () => next());
+});
+
+function findTransactions(importId) {
+    return new Promise(function (resolve) {
+        if (!importId) {
+            resolve();
+        } else {
+            mongoose.model('transactions').find({ importId: importId }, async function (err, transactions) {
+                if (err || _.isEmpty(transactions)) {
+                    resolve();
+                } else {
+                    let myPromises = [];
+                    transactions.map(transaction => myPromises.push(deleteTransaction(transaction._id)));
+                    await Promise.all(myPromises).then( () => resolve());
+                }
+            });
+        }
+    });
+}
+
+function deleteTransaction(transactionId) {
+    return new Promise(function(resolve) {
+        if (!transactionId) {
+            resolve();
+        } else {
+            mongoose.model('transactions').findByIdAndDelete(transactionId, function (err, res) {
+                if (!!err || !res) {
+                    resolve();
+                } else {
+                    resolve();
+                }
+            });
+        }
+    });
+}
+
 ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function(doc, next) {
     let documentId = doc.documentId;
     mongoose.model('importitems').find({ documentId: documentId }, function(errItems, resItems) {

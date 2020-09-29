@@ -57,6 +57,7 @@ app.use('/exportdoc/uploadFile', passport.authenticate('jwt', { session: false }
 app.use('/exportitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/delete'));
 app.use('/exportitem/downloadDuf', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/downloadDuf'));
 app.use('/exportitem/findCandidates', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/findCandidates'));
+app.use('/exportitem/update', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/update'));
 app.use('/exportitem/uploadDuf', passport.authenticate('jwt', { session: false }), require('./routes/exportitem/uploadDuf'));
 //importdoc
 app.use('/importdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/create'));
@@ -69,6 +70,7 @@ app.use('/importdoc/uploadFile', passport.authenticate('jwt', { session: false }
 //importitem
 app.use('/importitem/delete', passport.authenticate('jwt', { session: false }), require('./routes/importitem/delete'));
 app.use('/importitem/downloadDuf', passport.authenticate('jwt', { session: false }), require('./routes/importitem/downloadDuf'));
+app.use('/importitem/update', passport.authenticate('jwt', { session: false }), require('./routes/importitem/update'));
 app.use('/importitem/uploadDuf', passport.authenticate('jwt', { session: false }), require('./routes/importitem/uploadDuf'));
 //user
 app.use('/user/changePwd', passport.authenticate('jwt', { session: false }), require('./routes/user/changePwd'));

@@ -72,6 +72,7 @@ router.post('/', (req, res) => {
                             unitPrice: cur.unitPrice,
                             totalPrice: cur.totalPrice,
                             hsCode: cur.hsCode,
+                            hsDesc: cur.hsDesc,
                             country: cur.country,
                             remainingPcs: cur.remainingPcs,
                             remainingMtr: cur.remainingMtr,

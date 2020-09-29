@@ -132,13 +132,13 @@ function findItems(documentId) {
         if (!documentId) {
             resolve();
         } else {
-            mongoose.model('importitems').find({ documentId: documentId }, function (err, items) {
+            mongoose.model('importitems').find({ documentId: documentId }, async function (err, items) {
                 if (err || _.isEmpty(items)) {
                     resolve();
                 } else {
                     let myPromises = [];
                     items.map(item => myPromises.push(deleteItem(item._id)));
-                    Promise.all(myPromises).then( () => resolve());
+                    await Promise.all(myPromises).then( () => resolve());
                 }
             });
         }
