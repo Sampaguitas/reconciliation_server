@@ -49,6 +49,7 @@ app.listen(port, () => console.log(`Server running on ${port}`));
 app.use('/exportdoc/create', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/create'));
 app.use('/exportdoc/delete', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/delete'));
 app.use('/exportdoc/downloadFile', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/downloadFile'));
+app.use('/exportdoc/downloadInvoice', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/downloadInvoice'));
 app.use('/exportdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findAll'));
 app.use('/exportdoc/findOne', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findOne'));
 app.use('/exportdoc/update', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/update'));
