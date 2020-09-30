@@ -52,75 +52,75 @@ router.get('/', function (req, res) {
                     const invSheet = workbook.getWorksheet('Invoice');
                     const delSheet = workbook.getWorksheet('Delivery Advice');
                     const sumSheet = workbook.getWorksheet('HS Code Summary');
-                    let exportitems = exportdoc.items.reduce(function(acc, exportitem) {
-                            exportitem.transactions.map(transaction => {
-                                let number = `${transaction.importitem.importdoc.decNr} ${transaction.importitem.importdoc.boeNr}`
-                                acc.lines.push({
-                                    'A': exportitem.srNr,
-                                    'B': number,
-                                    'C': transaction.importitem.poNr,
-                                    'E': transaction.importitem.srNr,
-                                    'G': transaction.importitem.pcs,
-                                    'H': transaction.importitem.desc,
-                                    'I': transaction.importitem.hsCode,
-                                    'J': transaction.importitem.country,
-                                    'K': 'NEW',
-                                    'L': transaction.importitem.pcs,
-                                    'M': 'PCS',
-                                    'N': transaction.importitem.unitNetWeight * transaction.pcs,
-                                    'O': transaction.importitem.unitGrossWeight * transaction.pcs,
-                                    'P': exportitem.unitPrice,
-                                    'Q': exportitem.unitPrice * transaction.pcs,
-                                });
-                                if (!acc.numbers.includes(number)) {
-                                    acc.numbers.push(number);
-                                }
-                                if (!acc.countries.includes(transaction.importitem.country)) {
-                                    acc.countries.push(transaction.importitem.country);
-                                }
-                            });
-                        return acc;
-                    }, {
-                        lines: [],
-                        numbers: [],
-                        countries: [],
-                    });
-                    //fill worksheet invoice
-                    invSheet.getCell('H2').value = new Date();
-                    invSheet.getCell('M2').value = exportdoc.invNr;
-                    invSheet.getCell('P8').value = exportdoc.currency;
-                    invSheet.duplicateRow(18, exportitems.lines.length -1, true);
-                    exportitems.lines.map(function (line, lineIndex) {
-                        for (let key in line) {
-                            invSheet.getCell(`${key}${18 + lineIndex}`).value = line[key];
-                        }
-                    });
+                    // let exportitems = exportdoc.items.reduce(function(acc, exportitem) {
+                    //         exportitem.transactions.map(transaction => {
+                    //             let number = `${transaction.importitem.importdoc.decNr} ${transaction.importitem.importdoc.boeNr}`
+                    //             acc.lines.push({
+                    //                 'A': exportitem.srNr,
+                    //                 'B': number,
+                    //                 'C': transaction.importitem.poNr,
+                    //                 'E': transaction.importitem.srNr,
+                    //                 'G': transaction.importitem.pcs,
+                    //                 'H': transaction.importitem.desc,
+                    //                 'I': transaction.importitem.hsCode,
+                    //                 'J': transaction.importitem.country,
+                    //                 'K': 'NEW',
+                    //                 'L': transaction.importitem.pcs,
+                    //                 'M': 'PCS',
+                    //                 'N': transaction.importitem.unitNetWeight * transaction.pcs,
+                    //                 'O': transaction.importitem.unitGrossWeight * transaction.pcs,
+                    //                 'P': exportitem.unitPrice,
+                    //                 'Q': exportitem.unitPrice * transaction.pcs,
+                    //             });
+                    //             if (!acc.numbers.includes(number)) {
+                    //                 acc.numbers.push(number);
+                    //             }
+                    //             if (!acc.countries.includes(transaction.importitem.country)) {
+                    //                 acc.countries.push(transaction.importitem.country);
+                    //             }
+                    //         });
+                    //     return acc;
+                    // }, {
+                    //     lines: [],
+                    //     numbers: [],
+                    //     countries: [],
+                    // });
+
+                    // invSheet.getCell('H2').value = new Date();
+                    // invSheet.getCell('M2').value = exportdoc.invNr;
+                    // invSheet.getCell('P8').value = exportdoc.currency;
+                    // invSheet.duplicateRow(18, exportitems.lines.length -1, true);
+                    // exportitems.lines.map(function (line, lineIndex) {
+                    //     for (let key in line) {
+                    //         invSheet.getCell(`${key}${18 + lineIndex}`).value = line[key];
+                    //     }
+                    // });
                     
-                    //fill worksheet delivery advise
-                    delSheet.getCell('A17').value = exportdoc.invNr;
-                    let numbers = reshape(exportitems.numbers, Math.ceil(exportitems.numbers.length / 14));
-                    numbers.map((number, index) => {
-                        if ( index % 2 == 0) {
-                            delSheet.getCell(`A${35 + Math.max(index / 2, 0)}`).value = number.join(' / ');
-                        } else {
-                            delSheet.getCell(`G${35 + Math.max(index / 2, 0) - 1}`).value = number.join(' / ');
-                        }
-                    })
-                    delSheet.getCell('L38').value = exportitems.countries.join(' / ');
-                    delSheet.getCell('O38').value = `${exportdoc.currency} ${numberToString(exportdoc.totalPrice)}`;
-                    //fill worksheet HS Code summary
-                    sumSheet.getCell('H8').value = exportdoc.currency;
-                    sumSheet.duplicateRow(9, exportdoc.summary.length -1, true);
-                    exportdoc.summary.map(function (line, lineIndex) {
-                        sumSheet.getCell(`A${9 + lineIndex}`).value = line.hsCode;
-                        sumSheet.getCell(`B${9 + lineIndex}`).value = line.hsDesc;
-                        sumSheet.getCell(`C${9 + lineIndex}`).value = line.country;
-                        sumSheet.getCell(`D${9 + lineIndex}`).value = line.pcs;
-                        sumSheet.getCell(`E${9 + lineIndex}`).value = line.mtr;
-                        sumSheet.getCell(`F${9 + lineIndex}`).value = line.totalNetWeight;
-                        sumSheet.getCell(`G${9 + lineIndex}`).value = line.totalGrossWeight;
-                        sumSheet.getCell(`H${9 + lineIndex}`).value = line.totalPrice;
-                    });
+
+                    // delSheet.getCell('A17').value = exportdoc.invNr;
+                    // let numbers = reshape(exportitems.numbers, Math.ceil(exportitems.numbers.length / 14));
+                    // numbers.map((number, index) => {
+                    //     if ( index % 2 == 0) {
+                    //         delSheet.getCell(`A${35 + Math.max(index / 2, 0)}`).value = number.join(' / ');
+                    //     } else {
+                    //         delSheet.getCell(`G${35 + Math.max(index / 2, 0) - 1}`).value = number.join(' / ');
+                    //     }
+                    // });
+                    // delSheet.getCell('L38').value = exportitems.countries.join(' / ');
+                    // delSheet.getCell('O38').value = `${exportdoc.currency} ${numberToString(exportdoc.totalPrice)}`;
+
+                    // sumSheet.getCell('H8').value = exportdoc.currency;
+                    // sumSheet.duplicateRow(9, exportdoc.summary.length -1, true);
+                    // exportdoc.summary.map(function (line, lineIndex) {
+                    //     sumSheet.getCell(`A${9 + lineIndex}`).value = line.hsCode;
+                    //     sumSheet.getCell(`B${9 + lineIndex}`).value = line.hsDesc;
+                    //     sumSheet.getCell(`C${9 + lineIndex}`).value = line.country;
+                    //     sumSheet.getCell(`D${9 + lineIndex}`).value = line.pcs;
+                    //     sumSheet.getCell(`E${9 + lineIndex}`).value = line.mtr;
+                    //     sumSheet.getCell(`F${9 + lineIndex}`).value = line.totalNetWeight;
+                    //     sumSheet.getCell(`G${9 + lineIndex}`).value = line.totalGrossWeight;
+                    //     sumSheet.getCell(`H${9 + lineIndex}`).value = line.totalPrice;
+                    // });
                     workbook.xlsx.write(res);
                 });
             }
