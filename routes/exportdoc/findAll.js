@@ -62,7 +62,6 @@ router.post('/', (req, res) => {
         })
         .exec(function (err, exportDocs) {
             if (err) {
-                console.log(err);
                 return res.status(400).json({ message: 'An error has occured.' });
             } else {
                 let pageLast = Math.ceil(exportDocs.length / pageSize) || 1;

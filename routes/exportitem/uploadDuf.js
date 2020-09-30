@@ -205,7 +205,6 @@ router.post('/', upload.single('file'), function (req, res) {
           });
         })
         .catch( (err) => {
-          console.log(err);
           resolve({
             row: row,
             isRejected: true,

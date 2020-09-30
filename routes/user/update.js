@@ -12,7 +12,6 @@ router.put('/', (req, res) => {
         let options = { new: true };
     
         User.findOneAndUpdate(filter, update, options, function (err, user) {
-            console.log('user:', user);
             if (err) {
                 return res.status(400).json({ message: 'An error has occured.'});
             } else if (!user) {

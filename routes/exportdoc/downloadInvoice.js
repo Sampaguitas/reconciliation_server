@@ -2,8 +2,7 @@ var express = require('express');
 const router = express.Router();
 var Excel = require('exceljs');
 var aws = require('aws-sdk');
-var path = require('path');
-fs = require('fs');
+var _ = require('lodash');
 const accessKeyId = require('../../config/keys').accessKeyId; //../config/keys
 const secretAccessKey = require('../../config/keys').secretAccessKey;
 const region = require('../../config/keys').region;
@@ -55,9 +54,10 @@ router.get('/', function (req, res) {
                     const sumSheet = workbook.getWorksheet('HS Code Summary');
                     let exportitems = exportdoc.items.reduce(function(acc, exportitem) {
                             exportitem.transactions.map(transaction => {
-                                acc.push({
+                                let number = `${transaction.importitem.importdoc.decNr} ${transaction.importitem.importdoc.boeNr}`
+                                acc.lines.push({
                                     'A': exportitem.srNr,
-                                    'B': `${transaction.importitem.importdoc.dec} ${transaction.importitem.importdoc.boe}`,
+                                    'B': number,
                                     'C': transaction.importitem.poNr,
                                     'E': transaction.importitem.srNr,
                                     'G': transaction.importitem.pcs,
@@ -72,18 +72,76 @@ router.get('/', function (req, res) {
                                     'P': exportitem.unitPrice,
                                     'Q': exportitem.unitPrice * transaction.pcs,
                                 });
+                                if (!acc.numbers.includes(number)) {
+                                    acc.numbers.push(number);
+                                }
+                                if (!acc.countries.includes(transaction.importitem.country)) {
+                                    acc.countries.push(transaction.importitem.country);
+                                }
                             });
                         return acc;
-                    }, []);
-                    console.log(exportitems.length);
+                    }, {
+                        lines: [],
+                        numbers: [],
+                        countries: [],
+                    });
+                    //fill worksheet invoice
                     invSheet.getCell('H2').value = new Date();
                     invSheet.getCell('M2').value = exportdoc.invNr;
                     invSheet.getCell('P8').value = exportdoc.currency;
+                    invSheet.duplicateRow(18, exportitems.lines.length -1, true);
+                    exportitems.lines.map(function (line, lineIndex) {
+                        for (let key in line) {
+                            invSheet.getCell(`${key}${18 + lineIndex}`).value = line[key];
+                        }
+                    });
+                    
+                    //fill worksheet delivery advise
+                    delSheet.getCell('A17').value = exportdoc.invNr;
+                    let numbers = reshape(exportitems.numbers, Math.ceil(exportitems.numbers.length / 14));
+                    numbers.map((number, index) => {
+                        if ( index % 2 == 0) {
+                            delSheet.getCell(`A${35 + Math.max(index / 2, 0)}`).value = number.join(' / ');
+                        } else {
+                            delSheet.getCell(`G${35 + Math.max(index / 2, 0) - 1}`).value = number.join(' / ');
+                        }
+                    })
+                    delSheet.getCell('L38').value = exportitems.countries.join(' / ');
+                    delSheet.getCell('O38').value = `${exportdoc.currency} ${numberToString(exportdoc.totalPrice)}`;
+                    //fill worksheet HS Code summary
+                    sumSheet.getCell('H8').value = exportdoc.currency;
+                    sumSheet.duplicateRow(9, exportdoc.summary.length -1, true);
+                    exportdoc.summary.map(function (line, lineIndex) {
+                        sumSheet.getCell(`A${9 + lineIndex}`).value = line.hsCode;
+                        sumSheet.getCell(`B${9 + lineIndex}`).value = line.hsDesc;
+                        sumSheet.getCell(`C${9 + lineIndex}`).value = line.country;
+                        sumSheet.getCell(`D${9 + lineIndex}`).value = line.pcs;
+                        sumSheet.getCell(`E${9 + lineIndex}`).value = line.mtr;
+                        sumSheet.getCell(`F${9 + lineIndex}`).value = line.totalNetWeight;
+                        sumSheet.getCell(`G${9 + lineIndex}`).value = line.totalGrossWeight;
+                        sumSheet.getCell(`H${9 + lineIndex}`).value = line.totalPrice;
+                    });
                     workbook.xlsx.write(res);
                 });
             }
         });
     }
 });
+
+function numberToString (fieldValue) {
+    if (fieldValue) {
+        return String(new Intl.NumberFormat().format(Math.round((fieldValue + Number.EPSILON) * 100) / 100));
+    } else {
+        return '';
+    }
+}
+
+function reshape(array, n){
+    return _.compact(array.map(function(el, i){
+        if (i % n === 0) {
+            return array.slice(i, i + n);
+        }
+    }))
+}
 
 module.exports = router;

@@ -44,7 +44,6 @@ router.put('/', (req, res) => {
     
         ImportItem.findOneAndUpdate(filter, update, options, function (err, importitem) {
             if (err) {
-                console.log(err);
                 return res.status(400).json({ message: 'An error has occured.'});
             } else if (!importitem) {
                 return res.status(400).json({ message: 'item could not be updated.'});
