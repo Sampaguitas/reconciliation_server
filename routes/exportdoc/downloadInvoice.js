@@ -24,11 +24,11 @@ router.get('/', function (req, res) {
         ExportDoc.findById(documentId)
         .populate([
             {
-                path: 'exportitems',
+                path: 'items',
                 populate: {
                     path: 'transactions',
                     populate: {
-                        path: 'importitems',
+                        path: 'importitem',
                         populate: {
                             path: 'importdoc'
                         }
@@ -50,6 +50,35 @@ router.get('/', function (req, res) {
                 var wb = new Excel.Workbook();
                 wb.xlsx.read(s3.getObject(params).createReadStream())
                 .then(async function(workbook) {
+                    const invSheet = workbook.getWorksheet('Invoice');
+                    const delSheet = workbook.getWorksheet('Delivery Advice');
+                    const sumSheet = workbook.getWorksheet('HS Code Summary');
+                    let exportitems = exportdoc.items.reduce(function(acc, exportitem) {
+                            exportitem.transactions.map(transaction => {
+                                acc.push({
+                                    'A': exportitem.srNr,
+                                    'B': `${transaction.importitem.importdoc.dec} ${transaction.importitem.importdoc.boe}`,
+                                    'C': transaction.importitem.poNr,
+                                    'E': transaction.importitem.srNr,
+                                    'G': transaction.importitem.pcs,
+                                    'H': transaction.importitem.desc,
+                                    'I': transaction.importitem.hsCode,
+                                    'J': transaction.importitem.country,
+                                    'K': 'NEW',
+                                    'L': transaction.importitem.pcs,
+                                    'M': 'PCS',
+                                    'N': transaction.importitem.unitNetWeight * transaction.pcs,
+                                    'O': transaction.importitem.unitGrossWeight * transaction.pcs,
+                                    'P': exportitem.unitPrice,
+                                    'Q': exportitem.unitPrice * transaction.pcs,
+                                });
+                            });
+                        return acc;
+                    }, []);
+                    console.log(exportitems.length);
+                    invSheet.getCell('H2').value = new Date();
+                    invSheet.getCell('M2').value = exportdoc.invNr;
+                    invSheet.getCell('P8').value = exportdoc.currency;
                     workbook.xlsx.write(res);
                 });
             }
