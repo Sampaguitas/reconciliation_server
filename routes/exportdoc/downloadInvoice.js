@@ -22,20 +22,20 @@ router.get('/', function (req, res) {
         return res.status(400).json({message: "documentId is missing."});
     } else {
         ExportDoc.findById(documentId)
-        .populate([
-            {
-                path: 'items',
-                populate: {
-                    path: 'transactions',
-                    populate: {
-                        path: 'importitem',
-                        populate: {
-                            path: 'importdoc'
-                        }
-                    }
-                }
-            }
-        ])
+        // .populate([
+        //     {
+        //         path: 'items',
+        //         populate: {
+        //             path: 'transactions',
+        //             populate: {
+        //                 path: 'importitem',
+        //                 populate: {
+        //                     path: 'importdoc'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // ])
         .exec(function(err, exportdoc) {
             if (err) {
                 return res.status(400).json({message: 'An error has occured'});
