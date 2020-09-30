@@ -8,6 +8,7 @@ const accessKeyId = require('../../config/keys').accessKeyId; //../config/keys
 const secretAccessKey = require('../../config/keys').secretAccessKey;
 const region = require('../../config/keys').region;
 const awsBucketName = require('../../config/keys').awsBucketName;
+const ExportDoc = require('../../models/ExportDoc');
 
 aws.config.update({
     accessKeyId: accessKeyId,
@@ -20,16 +21,39 @@ router.get('/', function (req, res) {
     if (!documentId) {
         return res.status(400).json({message: "documentId is missing."});
     } else {
-        var s3 = new aws.S3();
-        var params = {
-            Bucket: awsBucketName,
-            Key: 'invoice.xlsx',
-        };
-
-        s3.getObject(params).createReadStream()
-        .on('error', () => {
-        res.status(400).json({message: "File could not be located - Please upload a new one"});
-        }).pipe(res);
+        ExportDoc.findById(documentId)
+        .populate([
+            {
+                path: 'exportitems',
+                populate: {
+                    path: 'transactions',
+                    populate: {
+                        path: 'importitems',
+                        populate: {
+                            path: 'importdoc'
+                        }
+                    }
+                }
+            }
+        ])
+        .exec(function(err, exportdoc) {
+            if (err) {
+                return res.status(400).json({message: 'An error has occured'});
+            } else if (!exportdoc) {
+                return res.status(400).json({message: 'Could not retrive project information.'});
+            } else {
+                var s3 = new aws.S3();
+                var params = {
+                    Bucket: awsBucketName,
+                    Key: 'invoice.xlsx',
+                };
+                var wb = new Excel.Workbook();
+                wb.xlsx.read(s3.getObject(params).createReadStream())
+                .then(async function(workbook) {
+                    workbook.xlsx.write(res);
+                });
+            }
+        });
     }
 });
 
