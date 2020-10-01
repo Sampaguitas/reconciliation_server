@@ -25,7 +25,7 @@ const ImportDocSchema = new Schema({
     },
     sfiNr: {
         type: String,
-        required: true
+        default: "",
     },
     boeDate: {
         type: Date,

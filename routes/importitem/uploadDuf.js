@@ -6,6 +6,7 @@ var storage = multer.memoryStorage()
 var upload = multer({ storage: storage })
 fs = require('fs');
 var _ = require('lodash');
+const ImportDoc = require('../../models/ImportDoc');
 const ImportItem = require('../../models/ImportItem');
 
 let headers = [
@@ -16,14 +17,13 @@ let headers = [
   { number: 'E', key: 'desc', value: 'Description', type: 'text' },
   { number: 'F', key: 'pcs', value: 'Pcs', type: 'number' },
   { number: 'G', key: 'mtr', value: 'Mtr', type: 'number' },
-  { number: 'H', key: 'totalNetWeight', value: 'Net Weight', type: 'number' },
-  { number: 'I', key: 'totalGrossWeight', value: 'Gross Weight', type: 'number' },
-  { number: 'J', key: 'totalPrice', value: 'Total Price', type: 'number' },
-  { number: 'K', key: 'insurance', value: 'Insurance', type: 'number' },
-  { number: 'L', key: 'exRate', value: 'Ex Rate', type: 'number' },
-  { number: 'M', key: 'hsCode', value: 'HS Code', type: 'text' },
-  { number: 'N', key: 'hsDesc', value: 'HS Desc', type: 'text' },
-  { number: 'O', key: 'country', value: 'Country', type: 'text' },
+  { number: 'H', key: 'totalNetWeight', value: 'Total Net Weight (SAP)', type: 'number' },
+  { number: 'I', key: 'totalPrice', value: 'Total Price', type: 'number' },
+  { number: 'J', key: 'insurance', value: 'Insurance', type: 'number' },
+  { number: 'K', key: 'exRate', value: 'Ex Rate', type: 'number' },
+  { number: 'L', key: 'hsCode', value: 'HS Code', type: 'text' },
+  { number: 'M', key: 'hsDesc', value: 'HS Desc', type: 'text' },
+  { number: 'N', key: 'country', value: 'Country', type: 'text' },
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
@@ -66,74 +66,97 @@ router.post('/', upload.single('file'), function (req, res) {
               nAdded: nAdded,
             });
           } else {
- 
-            (async function() {
-              for (let row = 2; row < rowCount + 1 ; row++) {
-
-                colPromises = [];
-
-                //initialise objects
-                for (var member in tempItem) delete tempItem[member];
-                
-                //assign projectId
-                tempItem.documentId = documentId;
-
-                headers.map(header => {
-                  let cell = `${header.number}${row}`;
-                  let type = header.type;
-                  let key = header.key;
-                  let value = worksheet.getCell(cell).value
-                  
-                  if (type === 'String' && value === 0) {
-                    value = '0'
-                  } else if (nonPrintable.test(value)) {
-                    value = value.replace(nonPrintable, '');
-                  }
-                  
-                  colPromises.push(testFormat(row, cell, type, value));
-                  
-                  tempItem[key] = value;
-
-                });
-
-                await Promise.all(colPromises).then( async () => {
-                  rowPromises.push(upsert(documentId, row, tempItem));
-                }).catch(errPromises => {
-                  if(!_.isEmpty(errPromises)) {
-                    rejections.push(errPromises);
-                  }
-                  nRejected++;
-                });
-
-                nProcessed++;
-              }
-
-              await Promise.all(rowPromises).then(resRowPromises => {
-                resRowPromises.map(r => {
-                  if (r.isRejected) {
-                    rejections.push({row: r.row, reason: r.reason});
-                    nRejected++;
-                  } else {
-                    nAdded++;
-                  }
-                });
-                return res.status(200).json({
-                  rejections: rejections,
-                  nProcessed: nProcessed,
-                  nRejected: nRejected,
-                  nAdded: nAdded,
-                });
-              }).catch( () => {
+            ImportDoc.findById(documentId, function(errDoc, importdoc) {
+              if (!!errDoc || !importdoc) {
                 return res.status(400).json({
-                  message: 'An error has occured during the upload.',
+                  message: 'An error has occured.',
                   rejections: rejections,
                   nProcessed: nProcessed,
                   nRejected: nRejected,
                   nAdded: nAdded,
                 });
-              });
-              
-            })();
+              } else {
+                let grnWeight = 0
+                for (let row = 2; row < rowCount + 1 ; row++) {
+                  grnWeight += (Number(worksheet.getCell(`H${row}`).value) || 0);
+                } if (!grnWeight || !importdoc.totalNetWeight || !importdoc.totalGrossWeight) {
+                  return res.status(400).json({
+                    message: 'GRN Net Weight, ImportDoc Net Wight and ImportDoc Gross Weight should not be null',
+                    rejections: rejections,
+                    nProcessed: nProcessed,
+                    nRejected: nRejected,
+                    nAdded: nAdded,
+                  });
+                } else {
+                  (async function() {
+                    for (let row = 2; row < rowCount + 1 ; row++) {
+      
+                      colPromises = [];
+      
+                      //initialise objects
+                      for (var member in tempItem) delete tempItem[member];
+                      
+                      //assign projectId
+                      tempItem.documentId = documentId;
+      
+                      headers.map(header => {
+                        let cell = `${header.number}${row}`;
+                        let type = header.type;
+                        let key = header.key;
+                        let value = worksheet.getCell(cell).value
+                        
+                        if (type === 'String' && value === 0) {
+                          value = '0'
+                        } else if (nonPrintable.test(value)) {
+                          value = value.replace(nonPrintable, '');
+                        }
+                        
+                        colPromises.push(testFormat(row, cell, type, value));
+                        
+                        tempItem[key] = value;
+      
+                      });
+      
+                      await Promise.all(colPromises).then( async () => {
+                        rowPromises.push(upsert(documentId, row, tempItem, grnWeight, importdoc.totalNetWeight, importdoc.totalGrossWeight));
+                      }).catch(errPromises => {
+                        if(!_.isEmpty(errPromises)) {
+                          rejections.push(errPromises);
+                        }
+                        nRejected++;
+                      });
+      
+                      nProcessed++;
+                    }
+      
+                    await Promise.all(rowPromises).then(resRowPromises => {
+                      resRowPromises.map(r => {
+                        if (r.isRejected) {
+                          rejections.push({row: r.row, reason: r.reason});
+                          nRejected++;
+                        } else {
+                          nAdded++;
+                        }
+                      });
+                      return res.status(200).json({
+                        rejections: rejections,
+                        nProcessed: nProcessed,
+                        nRejected: nRejected,
+                        nAdded: nAdded,
+                      });
+                    }).catch( () => {
+                      return res.status(400).json({
+                        message: 'An error has occured during the upload.',
+                        rejections: rejections,
+                        nProcessed: nProcessed,
+                        nRejected: nRejected,
+                        nAdded: nAdded,
+                      });
+                    });
+                  })();
+                }
+              }
+            });
           }
         }).catch( () => {
           return res.status(400).json({
@@ -146,7 +169,7 @@ router.post('/', upload.single('file'), function (req, res) {
         });
   });
 
-  function upsert(documentId, row, tempItem) {
+  function upsert(documentId, row, tempItem, grnWeight, docNetWeight, docGrossWeight) {
     return new Promise (function (resolve, reject) {
       if (!tempItem.srNr) {
         resolve({
@@ -190,12 +213,6 @@ router.post('/', upload.single('file'), function (req, res) {
           isRejected: true,
           reason: 'Net Weight should not be empty.'
         });
-      } else if (!tempItem.totalGrossWeight) {
-        resolve({
-          row: row,
-          isRejected: true,
-          reason: 'Gross Weight should not be empty.'
-        });
       } else if (!tempItem.totalPrice) {
         resolve({
           row: row,
@@ -227,7 +244,7 @@ router.post('/', upload.single('file'), function (req, res) {
           reason: 'Country should not be empty.'
         });
       } else {
-        
+
         let insurance = tempItem.insurance || 0;
         let totalPrice = (tempItem.totalPrice + insurance) * tempItem.exRate;
 
@@ -239,10 +256,10 @@ router.post('/', upload.single('file'), function (req, res) {
           desc: tempItem.desc,
           pcs: tempItem.pcs,
           mtr: tempItem.mtr || 0,
-          unitNetWeight: tempItem.totalNetWeight / tempItem.pcs || 0,
-          totalNetWeight: tempItem.totalNetWeight,
-          unitGrossWeight: tempItem.totalGrossWeight / tempItem.pcs || 0,
-          totalGrossWeight: tempItem.totalGrossWeight,
+          unitNetWeight: ( ( (tempItem.totalNetWeight / grnWeight) * docNetWeight ) / tempItem.pcs) || 0,
+          totalNetWeight: ( (tempItem.totalNetWeight / grnWeight) * docNetWeight ),
+          unitGrossWeight: ( ( (tempItem.totalNetWeight / grnWeight) * docGrossWeight ) / tempItem.pcs) || 0,
+          totalGrossWeight: ( (tempItem.totalNetWeight / grnWeight) * docGrossWeight ),
           unitPrice: totalPrice / tempItem.pcs || 0,
           totalPrice: totalPrice,
           hsCode: tempItem.hsCode,

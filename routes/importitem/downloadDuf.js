@@ -11,14 +11,13 @@ let headers = [
     { number: 'E', value: 'Description' },
     { number: 'F', value: 'Pcs' },
     { number: 'G', value: 'Mtr' },
-    { number: 'H', value: 'Net Weight' },
-    { number: 'I', value: 'Gross Weight' },
-    { number: 'J', value: 'Total Price' },
-    { number: 'K', value: 'Insurance' },
-    { number: 'L', value: 'Ex Rate' },
-    { number: 'M', value: 'HS Code' },
-    { number: 'N', value: 'HS Desc' },
-    { number: 'O', value: 'Country' },
+    { number: 'H', value: 'Total Net Weight (SAP)' },
+    { number: 'I', value: 'Total Price' },
+    { number: 'J', value: 'Insurance' },
+    { number: 'K', value: 'Ex Rate' },
+    { number: 'L', value: 'HS Code' },
+    { number: 'M', value: 'HS Desc' },
+    { number: 'N', value: 'Country' },
 ];
 
 router.get('/', function (req, res) {
