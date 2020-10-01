@@ -15,7 +15,7 @@ router.delete('/', async (req, res) => {
             if (!!err || !doc) {
                 return res.status(400).json({message: 'Document could not be deleted.'});
             } else {
-                return res.status(400).json({message: 'Document has successfully been deleted.'});
+                return res.status(200).json({message: 'Document has successfully been deleted.'});
             }
         });
     }

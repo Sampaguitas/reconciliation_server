@@ -53,6 +53,7 @@ router.get('/', function (req, res) {
                     const invSheet = workbook.getWorksheet('Invoice');
                     const delSheet = workbook.getWorksheet('Delivery Advice');
                     const sumSheet = workbook.getWorksheet('HS Code Summary');
+                    const today = new Date();
                     let exportitems = exportdoc.items.reduce(function(acc, exportitem) {
                             exportitem.transactions.map(transaction => {
                                 let number = `${transaction.importitem.importdoc.decNr} ${transaction.importitem.importdoc.boeNr}`
@@ -86,8 +87,8 @@ router.get('/', function (req, res) {
                         numbers: [],
                         countries: [],
                     });
-
-                    invSheet.getCell('H2').value = new Date();
+                    //Invoice
+                    invSheet.getCell('H2').value = today;
                     invSheet.getCell('M2').value = exportdoc.invNr;
                     invSheet.getCell('P8').value = exportdoc.currency;
                     invSheet.duplicateRow(18, exportitems.lines.length -1, true);
@@ -97,7 +98,8 @@ router.get('/', function (req, res) {
                         }
                     });
                     
-
+                    //Delivery Advice
+                    delSheet.getCell('C6').value = today;
                     delSheet.getCell('A17').value = exportdoc.invNr;
                     let numbers = reshape(exportitems.numbers, Math.ceil(exportitems.numbers.length / 14));
                     numbers.map((number, index) => {
@@ -109,7 +111,7 @@ router.get('/', function (req, res) {
                     });
                     delSheet.getCell('L38').value = exportitems.countries.join(' / ');
                     delSheet.getCell('O38').value = `${exportdoc.currency} ${numberToString(exportdoc.totalPrice)}`;
-
+                    //HS Code Summary
                     sumSheet.getCell('H8').value = exportdoc.currency;
                     sumSheet.duplicateRow(9, exportdoc.summary.length -1, true);
                     exportdoc.summary.map(function (line, lineIndex) {
