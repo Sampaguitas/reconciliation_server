@@ -254,6 +254,13 @@ ImportItemSchema.virtual("importdoc", {
     justOne: true
 });
 
+ImportItemSchema.virtual("transactions", {
+    ref: 'transactions',
+    localField: '_id',
+    foreignField: 'importId',
+    justOne: false
+});
+
 ImportItemSchema.set('toJSON', { virtuals: true });
 
 module.exports= ImportItem = mongoose.model('importitems', ImportItemSchema);

@@ -9,7 +9,6 @@ router.post('/', (req, res) => {
 
     let documentId = req.body.documentId;
     let myPromises = [];
-    let nProcessed = 0;
     let nRejected = 0;
     let nAdded = 0;
 
