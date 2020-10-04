@@ -37,7 +37,7 @@ router.post('/', (req, res) => {
                         } else {
                             let conditions = { importId, exportId };
                             let update = { $inc: { pcs, mtr } };
-                            options = { new: true, upsert: true };
+                            let options = { new: true, upsert: true };
                             
                             Transaction.findOneAndUpdate(conditions, update, options, function(err, doc) {
                                 if (err) {

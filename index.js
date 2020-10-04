@@ -52,6 +52,7 @@ app.use('/exportdoc/downloadFile', passport.authenticate('jwt', { session: false
 app.use('/exportdoc/downloadInvoice', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/downloadInvoice'));
 app.use('/exportdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findAll'));
 app.use('/exportdoc/findOne', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/findOne'));
+app.use('/exportdoc/linkCandidates', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/linkCandidates'));
 app.use('/exportdoc/update', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/update'));
 app.use('/exportdoc/uploadFile', passport.authenticate('jwt', { session: false }), require('./routes/exportdoc/uploadFile'));
 //exportitem
