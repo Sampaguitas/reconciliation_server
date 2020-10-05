@@ -54,6 +54,12 @@ router.get('/', function (req, res) {
                     const delSheet = workbook.getWorksheet('Delivery Advice');
                     const sumSheet = workbook.getWorksheet('HS Code Summary');
                     const today = new Date();
+                    const invAlignment = ['B1', 'M1', 'A4', 'C4', 'I4', 'M4', 'A5', 'C5', 'A6', 'C6', 'A7', 'C7', 'C8', 'C9', 'A24', 'A29', 'A31', 'A40'];
+                    const delAlignment = ['L6', 'A8', 'A9', 'A11', 'A24', 'F24', 'L40', 'A42', 'F42', 'F44', 'B46', 'F46', 'L49', 'A50', 'L50', 'L58', 'L59'];
+                    const sumAlignment = ['A1', 'A2', 'A3'];
+                    invAlignment.map(address => invSheet.getCell(address).alignment = { wrapText: false });
+                    delAlignment.map(address => delSheet.getCell(address).alignment = { wrapText: false });
+                    sumAlignment.map(address => sumSheet.getCell(address).alignment = { wrapText: false });
                     let exportitems = exportdoc.items.reduce(function(acc, exportitem) {
                             exportitem.transactions.map(transaction => {
                                 let number = `${transaction.importitem.importdoc.decNr} ${transaction.importitem.importdoc.boeNr}`
