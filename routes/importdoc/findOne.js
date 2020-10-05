@@ -57,7 +57,7 @@ router.post('/', (req, res) => {
                     let testRemPcs = regRemPcs.test(cur.remainingPcsX);
                     let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
-                    if (testSrNr && testPcs && testMtr && testNetWeigth && testTotWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr) {
+                    if (testSrNr && testPcs && testMtr && testNetWeigth && testTotWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr && filterBool(filter.isClosed).includes(cur.isClosed)) {
                         acc.push({
                             _id: cur._id,
                             srNr: cur.srNr,
@@ -76,6 +76,7 @@ router.post('/', (req, res) => {
                             country: cur.country,
                             remainingPcs: cur.remainingPcs,
                             remainingMtr: cur.remainingMtr,
+                            status: cur.isClosed ? 'Closed' : 'Open',
                         });
                     }
                     return acc;
@@ -120,4 +121,12 @@ module.exports = router;
 
 function escape(string) {
     return !_.isUndefined(string) ? string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
+}
+
+function filterBool(element) {
+    switch (element) {
+        case 'false': return [false];
+        case 'true': return [true];
+        default: return [true, false, undefined];
+    }
 }

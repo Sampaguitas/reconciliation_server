@@ -63,7 +63,7 @@ router.post('/', (req, res) => {
                     let testRemPcs = regRemPcs.test(cur.remainingPcsX);
                     let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
-                    if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr) {
+                    if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr && filterBool(filter.isClosed).includes(cur.isClosed)) {
                         let tempArray = cur.transactions.reduce(function (accTransaction, curTransaction) {
                             accTransaction.push({
                                 _id: curTransaction._id,
@@ -97,6 +97,7 @@ router.post('/', (req, res) => {
                             importItems: tempArray,
                             remainingPcs: cur.remainingPcs,
                             remainingMtr: cur.remainingMtr,
+                            status: cur.isClosed ? 'Closed' : 'Open',
                         });
                     }
                     return acc;
@@ -144,4 +145,12 @@ module.exports = router;
 
 function escape(string) {
     return !_.isUndefined(string) ? string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
+}
+
+function filterBool(element) {
+    switch (element) {
+        case 'false': return [false];
+        case 'true': return [true];
+        default: return [true, false, undefined];
+    }
 }
