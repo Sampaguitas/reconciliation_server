@@ -30,7 +30,19 @@ const ImportDocSchema = new Schema({
     boeDate: {
         type: Date,
         required: true
+    },//-------------------------
+    exRate: {
+        type: Number,
+        required: true
     },
+    insurance: {
+        type: Number,
+        required: true
+    },
+    freight: {
+        type: Number,
+        required: true
+    },//--------------------------
     pcs: {
         type: Number,
         default: 0,

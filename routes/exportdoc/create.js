@@ -21,7 +21,7 @@ router.post('/', (req, res) => {
                 let newDocument = new ExportDoc({
                     invNr: invNr,
                     currency: currency.toUpperCase(),
-                    exRate: exRate,
+                    exRate: exRate || 1,
                     pcs: 0,
                     mtr: 0,
                     totalNetWeight: 0,

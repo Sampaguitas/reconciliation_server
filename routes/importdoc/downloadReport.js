@@ -109,14 +109,14 @@ router.get('/', function (req, res) {
                       hsDesc: cur.hsDesc,
                       country: cur.country,
                       unitNetWeight: cur.unitNetWeight,
-                      totalNetWeight: cur.totalNetWeight,
+                      unitGrossWeight: cur.unitGrossWeight,
                       //import
                       importSrNr: cur.srNr,
                       importInvNr: cur.invNr,
                       importPcs: cur.pcs,
                       importMtr: cur.mtr,
                       importUnitPrice: cur.unitPrice,
-                      importTotalPrice: cur.importTotalPrice,
+                      importTotalPrice: cur.totalPrice,
                       importTotalNetWeight: cur.totalNetWeight,
                       importTotalGrossWeight: cur.totalGrossWeight,
                       //export
@@ -199,7 +199,6 @@ router.get('/', function (req, res) {
                   }
                   return acc;
                 }, []);
-                console.log(rows);
                 rows.map((row, indexRow) => {
                   columns.map((column, indexCol) => {
                     worksheet.getRow(Number(indexRow) + 2).getCell(Number(indexCol) + 1).value = row[`${column.key}`]

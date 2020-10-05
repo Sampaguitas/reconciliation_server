@@ -19,11 +19,11 @@ let headers = [
   { number: 'G', key: 'mtr', value: 'Mtr', type: 'number' },
   { number: 'H', key: 'totalNetWeight', value: 'Total Net Weight (SAP)', type: 'number' },
   { number: 'I', key: 'totalPrice', value: 'Total Price', type: 'number' },
-  { number: 'J', key: 'insurance', value: 'Insurance', type: 'number' },
-  { number: 'K', key: 'exRate', value: 'Ex Rate', type: 'number' },
-  { number: 'L', key: 'hsCode', value: 'HS Code', type: 'text' },
-  { number: 'M', key: 'hsDesc', value: 'HS Desc', type: 'text' },
-  { number: 'N', key: 'country', value: 'Country', type: 'text' },
+  // { number: 'J', key: 'insurance', value: 'Insurance', type: 'number' },
+  // { number: 'K', key: 'exRate', value: 'Ex Rate', type: 'number' },
+  { number: 'J', key: 'hsCode', value: 'HS Code', type: 'text' },
+  { number: 'K', key: 'hsDesc', value: 'HS Desc', type: 'text' },
+  { number: 'L', key: 'country', value: 'Country', type: 'text' },
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
@@ -77,11 +77,21 @@ router.post('/', upload.single('file'), function (req, res) {
                 });
               } else {
                 let grnWeight = 0
+                let grnPrice = 0
                 for (let row = 2; row < rowCount + 1 ; row++) {
                   grnWeight += (Number(worksheet.getCell(`H${row}`).value) || 0);
+                  grnPrice += (Number(worksheet.getCell(`I${row}`).value) || 0);
                 } if (!grnWeight || !importdoc.totalNetWeight || !importdoc.totalGrossWeight) {
                   return res.status(400).json({
                     message: 'GRN Net Weight, ImportDoc Net Wight and ImportDoc Gross Weight should not be null',
+                    rejections: rejections,
+                    nProcessed: nProcessed,
+                    nRejected: nRejected,
+                    nAdded: nAdded,
+                  });
+                } else if (!grnPrice || !importdoc.exRate) {
+                  return res.status(400).json({
+                    message: 'GRN Total Price and ImportDoc exRate should not be null',
                     rejections: rejections,
                     nProcessed: nProcessed,
                     nRejected: nRejected,
@@ -118,7 +128,7 @@ router.post('/', upload.single('file'), function (req, res) {
                       });
       
                       await Promise.all(colPromises).then( async () => {
-                        rowPromises.push(upsert(documentId, row, tempItem, grnWeight, importdoc.totalNetWeight, importdoc.totalGrossWeight));
+                        rowPromises.push(upsert(documentId, row, tempItem, grnWeight, importdoc.totalNetWeight, importdoc.totalGrossWeight, grnPrice, importdoc.exRate || 1, importdoc.insurance || 0, importdoc.freight || 0));
                       }).catch(errPromises => {
                         if(!_.isEmpty(errPromises)) {
                           rejections.push(errPromises);
@@ -169,7 +179,7 @@ router.post('/', upload.single('file'), function (req, res) {
         });
   });
 
-  function upsert(documentId, row, tempItem, grnWeight, docNetWeight, docGrossWeight) {
+  function upsert(documentId, row, tempItem, grnWeight, docNetWeight, docGrossWeight, grnPrice, docExRate, docInsurance, docFreight) {
     return new Promise (function (resolve, reject) {
       if (!tempItem.srNr) {
         resolve({
@@ -219,12 +229,12 @@ router.post('/', upload.single('file'), function (req, res) {
           isRejected: true,
           reason: 'Total Price should not be empty.'
         });
-      } else if (!tempItem.exRate) {
-        resolve({
-          row: row,
-          isRejected: true,
-          reason: 'Exchange Rate should not be empty.'
-        });
+      // } else if (!tempItem.exRate) {
+      //   resolve({
+      //     row: row,
+      //     isRejected: true,
+      //     reason: 'Exchange Rate should not be empty.'
+      //   });
       } else if (!tempItem.hsCode) {
         resolve({
           row: row,
@@ -244,9 +254,10 @@ router.post('/', upload.single('file'), function (req, res) {
           reason: 'Country should not be empty.'
         });
       } else {
-
-        let insurance = tempItem.insurance || 0;
-        let totalPrice = (tempItem.totalPrice + insurance) * tempItem.exRate;
+        
+        let insurance = (tempItem.totalPrice / grnPrice) * docInsurance;
+        let freight = (tempItem.totalPrice / grnPrice) * docFreight;
+        let totalPrice = (tempItem.totalPrice * docExRate) + insurance + freight;
 
         let newItem = new ImportItem({
           srNr: tempItem.srNr,
