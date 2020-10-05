@@ -135,14 +135,14 @@ ImportItemSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], function
                     if(acc.invNrs == "") {
                         acc.invNrs = cur.invNr
                     } else {
-                        acc.invNrs += `| ${cur.invNr}`
+                        acc.invNrs += ` / ${cur.invNr}`
                     }
                 }
                 if (!!cur.poNr && !acc.poNrs.includes(cur.poNr)) {
                     if(acc.poNrs == "") {
                         acc.poNrs = cur.poNr
                     } else {
-                        acc.poNrs += `| ${cur.poNr}`
+                        acc.poNrs += ` / ${cur.poNr}`
                     }
                 }
                 acc.pcs += cur.pcs || 0;
