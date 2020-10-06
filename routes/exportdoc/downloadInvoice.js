@@ -103,7 +103,7 @@ router.get('/', function (req, res) {
                             invSheet.getCell(`${key}${18 + lineIndex}`).value = line[key];
                         }
                     });
-                    
+                    wsPageSetup(invSheet, 17, 'landscape');
                     //Delivery Advice
                     delSheet.getCell('C6').value = today;
                     delSheet.getCell('A17').value = exportdoc.invNr;
@@ -117,6 +117,7 @@ router.get('/', function (req, res) {
                     });
                     delSheet.getCell('L38').value = exportitems.countries.join(' / ');
                     delSheet.getCell('O38').value = `${exportdoc.currency} ${numberToString(exportdoc.totalPrice)}`;
+                    wsPageSetup(delSheet, 17, 'portrait');
                     //HS Code Summary
                     sumSheet.getCell('H8').value = exportdoc.currency;
                     sumSheet.duplicateRow(9, exportdoc.summary.length -1, true);
@@ -130,6 +131,7 @@ router.get('/', function (req, res) {
                         sumSheet.getCell(`G${9 + lineIndex}`).value = line.totalGrossWeight;
                         sumSheet.getCell(`H${9 + lineIndex}`).value = line.totalPrice;
                     });
+                    wsPageSetup(sumSheet, 8, 'portrait');
                     workbook.xlsx.write(res);
                 });
             }
@@ -152,5 +154,31 @@ function reshape(array, n){
         }
     }))
 }
+
+function wsPageSetup(worksheet, lastCol, orientation) {
+    worksheet.pageSetup = {
+      orientation: orientation,
+      paperSize: 9,
+      fitToPage: true,
+      fitToWidth: 1,
+      fitToHeight: 0,
+      printArea: `A1:${alphabet(lastCol) + worksheet.lastRow._number}`,
+      margins: {
+        left: 0.25, right: 0.25,
+        top: 0.75, bottom: 0.75,
+        header: 0.3, footer: 0.3    
+      }
+    }
+}
+
+function alphabet(num){
+    var s = '', t;
+    while (num > 0) {
+      t = (num - 1) % 26;
+      s = String.fromCharCode(65 + t) + s;
+      num = (num - t)/26 | 0;
+    }
+    return s || undefined;
+  }
 
 module.exports = router;

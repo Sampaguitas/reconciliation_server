@@ -195,12 +195,29 @@ router.get('/', function (req, res) {
                   worksheet.getCell(`T${i}`).value = round(importitem.totalNetWeight - (importitem.assignedPcs * importitem.unitNetWeight));
                   worksheet.getCell(`W${i}`).value = round(importitem.totalGrossWeight - (importitem.assignedPcs * importitem.unitGrossWeight));
                 });
+                wsPageSetup(worksheet, 23, 'landscape');
                 workbook.xlsx.write(res);
               });
             }
         });
     }
 });
+
+function wsPageSetup(worksheet, lastCol, orientation) {
+  worksheet.pageSetup = {
+    orientation: orientation,
+    paperSize: 9,
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 0,
+    printArea: `A1:${alphabet(lastCol) + worksheet.lastRow._number}`,
+    margins: {
+      left: 0.25, right: 0.25,
+      top: 0.75, bottom: 0.75,
+      header: 0.3, footer: 0.3    
+    }
+  }
+}
 
 function round(fieldValue) {
   if (!fieldValue) {
