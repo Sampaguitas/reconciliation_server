@@ -100,7 +100,64 @@ router.get('/', function (req, res) {
                 worksheet.getCell('B5').value = importdoc.boeNr || '';
                 worksheet.getCell('B6').value = importdoc.sfiNr || '';
                 worksheet.getCell('B7').value = importdoc.boeDate || '';
+
+                worksheet.getCell('F4').value = `${new Intl.NumberFormat().format(round(importdoc.pcs || 0))} Pcs`;
+                worksheet.getCell('F5').value = `${new Intl.NumberFormat().format(round(importdoc.mtr || 0))} Mtr`;
+                worksheet.getCell('F6').value = `${new Intl.NumberFormat().format(round((importdoc.pcs || 0) - (importdoc.assignedPcs || 0)))} Pcs`;
+                worksheet.getCell('F7').value = `${new Intl.NumberFormat().format(round((importdoc.mtr || 0) - (importdoc.assignedMtr || 0)))} Mtr`;
+
+                worksheet.getCell('J4').value = `${new Intl.NumberFormat().format(round(importdoc.totalPrice || 0))} AED`;
+                worksheet.getCell('J5').value = `${new Intl.NumberFormat().format(round(importdoc.totalNetWeight || 0))} Kgs`;
+                worksheet.getCell('J6').value = `${new Intl.NumberFormat().format(round(importdoc.totalGrossWeight || 0))} Kgs`;
+                worksheet.getCell('J7').value = importdoc.isClosed ? 'Closed' : 'Open';
                 // worksheet.columns = columns;
+                let countRows = importdoc.items.reduce(function (acc, cur) {
+                  return acc + cur.transactions.length + 3; 
+                }, 0);
+                worksheet.duplicateRow(12, Math.max(countRows - 4, 0), true);
+                
+                let i = 10;
+                importdoc.items.map((importitem) => {
+                  i++
+                  worksheet.getCell(`A${i}`).value = importitem.srNr;
+                  worksheet.getCell(`B${i}`).value = importitem.poNr;
+                  worksheet.getCell(`C${i}`).value = importitem.artNr;
+                  worksheet.getCell(`D${i}`).value = importitem.desc;
+                  worksheet.getCell(`D${i}`).alignment = { wrapText: false };
+                  worksheet.getCell(`F${i}`).value = importitem.hsCode;
+                  worksheet.getCell(`H${i}`).value = importitem.country;
+                  worksheet.getCell(`J${i}`).value = round(importitem.pcs);
+                  worksheet.getCell(`M${i}`).value = round(importitem.mtr);
+                  worksheet.getCell(`P${i}`).value = round(importitem.totalNetWeight);
+                  worksheet.getCell(`S${i}`).value = round(importitem.totalGrossWeight);
+                  worksheet.getCell(`V${i}`).value = round(importitem.unitPrice);
+                  worksheet.getCell(`X${i}`).value = round(importitem.totalPrice);
+                  i++;
+                  if (!_.isEmpty(importitem.transactions)) {
+                    importitem.transactions.map((transaction) => {
+                      console.log('exportdoc:', transaction.exportitem.exportdoc.decNr);
+                      worksheet.getCell(`E${i}`).value = `${transaction.exportitem.exportdoc.decNr} ${transaction.exportitem.exportdoc.boeNr}`;
+                      worksheet.getCell(`G${i}`).value = transaction.exportitem.exportdoc.boeDate;
+                      worksheet.getCell(`I${i}`).value = transaction.exportitem.srNr;
+                      worksheet.getCell(`K${i}`).value = round(transaction.pcs);
+                      worksheet.getCell(`N${i}`).value = round(transaction.mtr);
+                      worksheet.getCell(`Q${i}`).value = round(transaction.pcs * importitem.unitNetWeight);
+                      worksheet.getCell(`T${i}`).value = round(transaction.pcs * importitem.unitGrossWeight);
+                      i++;
+                    });
+                  }
+                  worksheet.getCell(`I${i}`).value = 'Remaining:'
+                  worksheet.getCell(`I${i}`).font = { name: 'Arial', family: 4, size: 10, underline: 'false', bold: true };
+                  worksheet.getCell(`L${i}`).value = round(importitem.pcs - importitem.assignedPcs);
+                  worksheet.getCell(`L${i}`).font = { name: 'Arial', family: 4, size: 10, underline: 'false', bold: true };
+                  worksheet.getCell(`O${i}`).value = round(importitem.mtr - importitem.assignedMtr);
+                  worksheet.getCell(`O${i}`).font = { name: 'Arial', family: 4, size: 10, underline: 'false', bold: true };
+                  worksheet.getCell(`R${i}`).value = round(importitem.totalNetWeight - (importitem.assignedPcs * importitem.unitNetWeight));
+                  worksheet.getCell(`R${i}`).font = { name: 'Arial', family: 4, size: 10, underline: 'false', bold: true };
+                  worksheet.getCell(`U${i}`).value = round(importitem.totalGrossWeight - (importitem.assignedPcs * importitem.unitGrossWeight));
+                  worksheet.getCell(`U${i}`).font = { name: 'Arial', family: 4, size: 10, underline: 'false', bold: true };
+                  i++
+                });
 
                 // let rows = importdoc.items.reduce(function(acc, cur) {
                 //   if (_.isEmpty(cur.transactions)) {
