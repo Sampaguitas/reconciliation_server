@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const _ = require('lodash');
-const ExportDoc = require('../../models/ExportDoc');
-const ImportItem = require('../../models/ImportItem');
+const ImportDoc = require('../../models/ImportDoc');
+const ExportItem = require('../../models/ExportItem')
 const Transaction = require('../../models/Transaction');
 
 router.post('/', (req, res) => {
@@ -12,50 +12,50 @@ router.post('/', (req, res) => {
     let nRejected = 0;
     let nAdded = 0;
 
-    ExportDoc
+    ImportDoc
     .findById(documentId)
     .populate('items')
-    .exec(function(err, exportDoc) {
+    .exec(function(err, importDoc) {
         if(err) {
             res.status(400).json({message: 'An error has occured.'});
-        } else if (!exportDoc) {
-            res.status(400).json({message: 'Could not retreive exportDoc information.'});
-        } else if (_.isEmpty(exportDoc.items)) {
-            res.status(400).json({message: 'The exportDoc does not contain any items.'});
+        } else if (!importDoc) {
+            res.status(400).json({message: 'Could not retreive importDoc information.'});
+        } else if (_.isEmpty(importDoc.items)) {
+            res.status(400).json({message: 'The importDoc does not contain any items.'});
         } else {
-            let poNrs = exportDoc.items.reduce(function(acc, cur) {
+            let poNrs = importDoc.items.reduce(function(acc, cur) {
                 if (!acc.includes(cur.poNr)) {
                     acc.push(cur.poNr);
                 }
                 return acc;
             }, []);
-            ImportItem.find({
-                poNr: { $in: poNrs}
-            }, async function(err, importitems) {
+            ExportItem.find({ poNr: { $in: poNrs}})
+            .populate('exportdoc')
+            .exec(async function(err, exportitems) {
                 if (err) {
                     res.status(400).json({message: 'An error has occured.'});
-                } else if (!importitems) {
+                } else if (!exportitems) {
                     res.status(400).json({message: 'could not find any candidates.'});
                 } else {
-                    let transactions = exportDoc.items.reduce(function(acc, cur) {
-                        let candidates = importitems.filter(element => _.isEqual(element.poNr, cur.poNr) && _.isEqual(element.artNr, cur.artNr));
+                    let transactions = importDoc.items.reduce(function(acc, cur) {
+                        let candidates = exportitems.filter(element => _.isEqual(element.poNr, cur.poNr) && _.isEqual(element.artNr, cur.artNr));
                         if (!_.isEmpty(candidates)) {
-                            let exportRemPcs = Math.max(cur.pcs - (cur.assignedPcs || 0), 0);
-                            let exportRemMtr = Math.max(cur.mtr - (cur.assignedMtr || 0), 0);
+                            let importRemPcs = Math.max(cur.pcs - (cur.assignedPcs || 0), 0);
+                            let importRemMtr = Math.max(cur.mtr - (cur.assignedMtr || 0), 0);
                             for (var index in candidates) {
-                                let importRemPcs = Math.max(candidates[index].pcs - (candidates[index].assignedPcs || 0), 0);
-                                let importRemMtr = Math.max(candidates[index].mtr - (candidates[index].assignedMtr || 0), 0);
-                                let pcs = Math.min(exportRemPcs, importRemPcs);
-                                let mtr = Math.min(exportRemMtr, importRemMtr);
-                                let isMore = (candidates[index].unitPrice / (exportDoc.exRate || 1) ) > cur.unitPrice
+                                let exportRemPcs = Math.max(candidates[index].pcs - (candidates[index].assignedPcs || 0), 0);
+                                let exportRemMtr = Math.max(candidates[index].mtr - (candidates[index].assignedMtr || 0), 0);
+                                let pcs = Math.min(importRemPcs, exportRemPcs);
+                                let mtr = Math.min(importRemMtr, exportRemMtr);
+                                let isMore = ( cur.unitPrice / (candidates[index].exportdoc.exRate || 1) ) > candidates[index].unitPrice 
                                 if ((pcs != 0 || mtr != 0) && !isMore) {
-                                    exportRemPcs = Math.max(exportRemPcs - pcs, 0);
-                                    exportRemMtr = Math.max(exportRemMtr - mtr, 0);
+                                    importRemPcs = Math.max(importRemPcs - pcs, 0);
+                                    importRemMtr = Math.max(importRemMtr - mtr, 0);
                                     candidates[index].assignedPcs += pcs;
                                     candidates[index].assignedMtr += mtr;
                                     acc.push({
-                                        importId: candidates[index]._id,
-                                        exportId: cur._id,
+                                        exportId: candidates[index]._id,
+                                        importId: cur._id,
                                         pcs: pcs,
                                         mtr: mtr
                                     });
@@ -98,9 +98,9 @@ function upsert(transaction) {
 
         Transaction.findOneAndUpdate(conditions, update, options, function(err, doc) {
             if (!!err || !doc) {
-                resolve({ isRejected: true });
+                resolve();
             } else {
-                resolve({ isRejected: false });
+                resolve();
             }
         });
     });

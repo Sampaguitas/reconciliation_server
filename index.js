@@ -68,6 +68,7 @@ app.use('/importdoc/downloadFile', passport.authenticate('jwt', { session: false
 app.use('/importdoc/downloadReport', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/downloadReport'));
 app.use('/importdoc/findAll', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findAll'));
 app.use('/importdoc/findOne', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/findOne'));
+app.use('/importdoc/linkCandidates', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/linkCandidates'));
 app.use('/importdoc/update', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/update'));
 app.use('/importdoc/uploadFile', passport.authenticate('jwt', { session: false }), require('./routes/importdoc/uploadFile'));
 //importitem

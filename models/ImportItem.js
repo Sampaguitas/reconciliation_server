@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const _ = require('lodash');
+const ImportDoc = require('./ImportDoc');
 
 const ImportItemSchema = new Schema({
     srNr: {
