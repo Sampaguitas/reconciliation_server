@@ -19,6 +19,15 @@ router.post('/', (req, res) => {
                     totalNetWeightX: { $toString: "$totalNetWeight" },
                     totalGrossWeightX: { $toString: "$totalGrossWeight" },
                     totalPriceX: { $toString: "$totalPrice" },
+                    hasFile: {
+                        $cond: {
+                            if: {
+                                $eq: ["$fileName", ""]
+                            },
+                            then: false,
+                            else: true
+                        }
+                    },
                 }
             },
             {
@@ -33,6 +42,7 @@ router.post('/', (req, res) => {
                     totalGrossWeightX: { $regex: new RegExp(escape(filter.totalGrossWeight),'i') },
                     totalPriceX: { $regex: new RegExp(escape(filter.totalPrice),'i') },
                     isClosed : { $in: filterBool(filter.isClosed)},
+                    hasFile : { $in: filterBool(filter.hasFile)},
                 }
             },
             {
@@ -53,7 +63,16 @@ router.post('/', (req, res) => {
                             then: "Closed",
                             else: "Open"
                         }
-                    }
+                    },
+                    hasFile: {
+                        $cond: {
+                            if: {
+                                $eq: ["$fileName", ""]
+                            },
+                            then: "False",
+                            else: "True"
+                        }
+                    },
                 }
             }
         ])
