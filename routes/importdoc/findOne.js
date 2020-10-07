@@ -42,6 +42,8 @@ router.post('/', (req, res) => {
                 let regGrossWeigth = new RegExp(escape(filter.totalGrossWeight), 'i');
                 let regUnitPrice = new RegExp(escape(filter.unitPrice), 'i');
                 let regTotalPrice = new RegExp(escape(filter.totalPrice), 'i');
+                let regAsgPcs = new RegExp(escape(filter.assignedPcs), 'i');
+                let regAsgMtr = new RegExp(escape(filter.assignedMtr), 'i');
                 let regRemPcs = new RegExp(escape(filter.remainingPcs), 'i');
                 let regRemMtr = new RegExp(escape(filter.remainingMtr), 'i');
                 
@@ -54,10 +56,12 @@ router.post('/', (req, res) => {
                     let testTotWeigth = regGrossWeigth.test(cur.totalGrossWeightX);
                     let testUnitPrice = regUnitPrice.test(cur.unitPriceX);
                     let testTotalPrice = regTotalPrice.test(cur.totalPriceX);
+                    let testAsgPcs = regAsgPcs.test(cur.assignedPcsX);
+                    let testAsgMtr = regAsgMtr.test(cur.assignedMtrX);
                     let testRemPcs = regRemPcs.test(cur.remainingPcsX);
                     let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
-                    if (testSrNr && testPcs && testMtr && testNetWeigth && testTotWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr && filterBool(filter.isClosed).includes(cur.isClosed)) {
+                    if (testSrNr && testPcs && testMtr && testNetWeigth && testTotWeigth && testUnitPrice && testTotalPrice && testAsgPcs && testAsgMtr && testRemPcs && testRemMtr && filterBool(filter.isClosed).includes(cur.isClosed)) {
                         acc.push({
                             _id: cur._id,
                             srNr: cur.srNr,
@@ -74,6 +78,8 @@ router.post('/', (req, res) => {
                             hsCode: cur.hsCode,
                             hsDesc: cur.hsDesc,
                             country: cur.country,
+                            assignedPcs: cur.assignedPcs,
+                            assignedMtr: cur.assignedMtr,
                             remainingPcs: cur.remainingPcs,
                             remainingMtr: cur.remainingMtr,
                             status: cur.isClosed ? 'Closed' : 'Open',

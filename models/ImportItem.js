@@ -208,6 +208,14 @@ ImportItemSchema.virtual("mtrX").get(function() {
     return !_.isUndefined(this.mtr) ? this.mtr.toString() : "";
 });
 
+ImportItemSchema.virtual("assignedPcsX").get(function() {
+    return !_.isUndefined(this.assignedPcs) ? (this.assignedPcs).toString() : "";
+});
+
+ImportItemSchema.virtual("assignedMtrX").get(function() {
+    return !_.isUndefined(this.assignedMtr) ? (this.assignedMtr).toString() : "";
+});
+
 ImportItemSchema.virtual("remainingPcs").get(function() {
     return (this.pcs || 0) - (this.assignedPcs || 0);
 });
@@ -224,17 +232,9 @@ ImportItemSchema.virtual("remainingMtrX").get(function() {
     return ((this.mtr || 0) - (this.assignedMtr || 0)).toString();
 });
 
-// ImportItemSchema.virtual("unitNetWeightX").get(function() {
-//     return !_.isUndefined(this.unitNetWeight) ? this.unitNetWeight.toString() : "";
-// });
-
 ImportItemSchema.virtual("totalNetWeightX").get(function() {
     return !_.isUndefined(this.totalNetWeight) ? this.totalNetWeight.toString() : "";
 });
-
-// ImportItemSchema.virtual("unitGrossWeightX").get(function() {
-//     return !_.isUndefined(this.unitGrossWeight) ? this.unitGrossWeight.toString() : "";
-// });
 
 ImportItemSchema.virtual("totalGrossWeightX").get(function() {
     return !_.isUndefined(this.totalGrossWeight) ? this.totalGrossWeight.toString() : "";

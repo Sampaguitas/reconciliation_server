@@ -48,6 +48,8 @@ router.post('/', (req, res) => {
                 let regGrossWeigth = new RegExp(escape(filter.totalGrossWeight), 'i');
                 let regUnitPrice = new RegExp(escape(filter.unitPrice), 'i');
                 let regTotalPrice = new RegExp(escape(filter.totalPrice), 'i');
+                let regAsgPcs = new RegExp(escape(filter.assignedPcs), 'i');
+                let regAsgMtr = new RegExp(escape(filter.assignedMtr), 'i');
                 let regRemPcs = new RegExp(escape(filter.remainingPcs), 'i');
                 let regRemMtr = new RegExp(escape(filter.remainingMtr), 'i');
                 
@@ -60,10 +62,12 @@ router.post('/', (req, res) => {
                     let testGrossWeigth = regGrossWeigth.test(cur.totalGrossWeightX);
                     let testUnitPrice = regUnitPrice.test(cur.unitPriceX);
                     let testTotalPrice = regTotalPrice.test(cur.totalPriceX);
+                    let testAsgPcs = regAsgPcs.test(cur.assignedPcsX);
+                    let testAsgMtr = regAsgMtr.test(cur.assignedMtrX);
                     let testRemPcs = regRemPcs.test(cur.remainingPcsX);
                     let testRemMtr = regRemMtr.test(cur.remainingMtrX);
                     
-                    if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice && testRemPcs && testRemMtr && filterBool(filter.isClosed).includes(cur.isClosed)) {
+                    if (testSrNr && testPcs && testMtr && testNetWeigth && testGrossWeigth && testUnitPrice && testTotalPrice && testAsgPcs && testAsgMtr && testRemPcs && testRemMtr && filterBool(filter.isClosed).includes(cur.isClosed)) {
                         let tempArray = cur.transactions.reduce(function (accTransaction, curTransaction) {
                             accTransaction.push({
                                 _id: curTransaction._id,
@@ -87,14 +91,16 @@ router.post('/', (req, res) => {
                             desc: cur.desc,
                             poNr: cur.poNr,
                             pcs: cur.pcs,
-                            remainingPcs: cur.remainingPcs,
-                            remainingMtr: cur.remainingMtr,
+                            // remainingPcs: cur.remainingPcs,
+                            // remainingMtr: cur.remainingMtr,
                             mtr: cur.mtr,
                             totalNetWeight: cur.totalNetWeight,
                             totalGrossWeight: cur.totalGrossWeight,
                             unitPrice: cur.unitPrice,
                             totalPrice: cur.totalPrice,
                             importItems: tempArray,
+                            assignedPcs: cur.assignedPcs,
+                            assignedMtr: cur.assignedMtr,
                             remainingPcs: cur.remainingPcs,
                             remainingMtr: cur.remainingMtr,
                             status: cur.isClosed ? 'Closed' : 'Open',

@@ -177,6 +177,14 @@ ExportItemSchema.virtual("mtrX").get(function() {
     return !_.isUndefined(this.mtr) ? this.mtr.toString() : "";
 });
 
+ExportItemSchema.virtual("assignedPcsX").get(function() {
+    return !_.isUndefined(this.assignedPcs) ? (this.assignedPcs).toString() : "";
+});
+
+ExportItemSchema.virtual("assignedMtrX").get(function() {
+    return !_.isUndefined(this.assignedMtr) ? (this.assignedMtr).toString() : "";
+});
+
 ExportItemSchema.virtual("remainingPcs").get(function() {
     return (this.pcs || 0) - (this.assignedPcs || 0);
 });
