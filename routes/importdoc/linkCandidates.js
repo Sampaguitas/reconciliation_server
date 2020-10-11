@@ -47,18 +47,22 @@ router.post('/', (req, res) => {
                                 let exportRemMtr = Math.max(candidates[index].mtr - (candidates[index].assignedMtr || 0), 0);
                                 let pcs = Math.min(importRemPcs, exportRemPcs);
                                 let mtr = Math.min(importRemMtr, exportRemMtr);
-                                let isMore = ( cur.unitPrice / (candidates[index].exportdoc.exRate || 1) ) > candidates[index].unitPrice 
-                                if ((pcs != 0 || mtr != 0) && !isMore) {
-                                    importRemPcs = Math.max(importRemPcs - pcs, 0);
-                                    importRemMtr = Math.max(importRemMtr - mtr, 0);
-                                    candidates[index].assignedPcs += pcs;
-                                    candidates[index].assignedMtr += mtr;
-                                    acc.push({
-                                        exportId: candidates[index]._id,
-                                        importId: cur._id,
-                                        pcs: pcs,
-                                        mtr: mtr
-                                    });
+                                // let isMore = ( cur.unitPrice / (candidates[index].exportdoc.exRate || 1) ) > candidates[index].unitPrice 
+                                let summary = importDoc.summary.find(element => _.isEqual(element.hsCode, cur.hsCode) && _.isEqual(element.country, cur.country));
+                                if (!_.isUndefined(summary)) {
+                                    let isMore = ((summary.totalPrice / summary.pcs) / (candidates[index].exportdoc.exRate || 1) ) > candidates[index].unitPrice;
+                                    if ((pcs != 0 || mtr != 0) && !isMore) {
+                                        importRemPcs = Math.max(importRemPcs - pcs, 0);
+                                        importRemMtr = Math.max(importRemMtr - mtr, 0);
+                                        candidates[index].assignedPcs += pcs;
+                                        candidates[index].assignedMtr += mtr;
+                                        acc.push({
+                                            exportId: candidates[index]._id,
+                                            importId: cur._id,
+                                            pcs: pcs,
+                                            mtr: mtr
+                                        });
+                                    }
                                 }
                             }
                         }

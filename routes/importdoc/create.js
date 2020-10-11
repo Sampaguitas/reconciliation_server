@@ -4,7 +4,7 @@ const ImportDoc = require('../../models/ImportDoc');
 
 router.post('/', (req, res) => {
 
-    const { decNr, boeNr, sfiNr, boeDate, exRate, insurance, freight, totalNetWeight, totalGrossWeight } = req.body;
+    const { decNr, boeNr, sfiNr, boeDate, totalNetWeight, totalGrossWeight } = req.body; //exRate, insurance, freight, 
     let regDec = /^\d{3}-\d{8}-\d{2}$/;
     let regBoe = /^\d{12}$/;
     
@@ -28,9 +28,9 @@ router.post('/', (req, res) => {
                     poNrs: "",
                     invNrs: "",
                     boeDate: boeDate,
-                    exRate: exRate || 1,
-                    insurance: insurance || 0,
-                    freight: freight || 0,
+                    // exRate: exRate || 1,
+                    // insurance: insurance || 0,
+                    // freight: freight || 0,
                     pcs: 0,
                     mtr: 0,
                     totalNetWeight: totalNetWeight,

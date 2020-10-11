@@ -31,7 +31,9 @@ router.post('/', (req, res) => {
             }, []);
             ImportItem.find({
                 poNr: { $in: poNrs}
-            }, async function(err, importitems) {
+            })
+            .populate('importdoc')
+            .exec(async function(err, importitems) {
                 if (err) {
                     res.status(400).json({message: 'An error has occured.'});
                 } else if (!importitems) {
@@ -47,18 +49,22 @@ router.post('/', (req, res) => {
                                 let importRemMtr = Math.max(candidates[index].mtr - (candidates[index].assignedMtr || 0), 0);
                                 let pcs = Math.min(exportRemPcs, importRemPcs);
                                 let mtr = Math.min(exportRemMtr, importRemMtr);
-                                let isMore = (candidates[index].unitPrice / (exportDoc.exRate || 1) ) > cur.unitPrice
-                                if ((pcs != 0 || mtr != 0) && !isMore) {
-                                    exportRemPcs = Math.max(exportRemPcs - pcs, 0);
-                                    exportRemMtr = Math.max(exportRemMtr - mtr, 0);
-                                    candidates[index].assignedPcs += pcs;
-                                    candidates[index].assignedMtr += mtr;
-                                    acc.push({
-                                        importId: candidates[index]._id,
-                                        exportId: cur._id,
-                                        pcs: pcs,
-                                        mtr: mtr
-                                    });
+                                // let isMore = (candidates[index].unitPrice / (exportDoc.exRate || 1) ) > cur.unitPrice
+                                let summary = candidates[index].importdoc.summary.find(element => _.isEqual(element.hsCode, candidates[index].hsCode) && _.isEqual(element.country, candidates[index].country));
+                                if (!_.isUndefined(summary)) {
+                                    let isMore = ((summary.totalPrice / summary.pcs) / (exportDoc.exRate || 1) ) > cur.unitPrice;
+                                    if ((pcs != 0 || mtr != 0) && !isMore) {
+                                        exportRemPcs = Math.max(exportRemPcs - pcs, 0);
+                                        exportRemMtr = Math.max(exportRemMtr - mtr, 0);
+                                        candidates[index].assignedPcs += pcs;
+                                        candidates[index].assignedMtr += mtr;
+                                        acc.push({
+                                            importId: candidates[index]._id,
+                                            exportId: cur._id,
+                                            pcs: pcs,
+                                            mtr: mtr
+                                        });
+                                    }
                                 }
                             }
                         }
