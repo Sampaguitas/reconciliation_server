@@ -80,14 +80,14 @@ router.post('/', upload.single('file'), function (req, res) {
                 
                 for (let row = 2; row < rowCount + 1 ; row++) {
                   grnWeight += (Number(worksheet.getCell(`H${row}`).value) || 0);
-                  let found = grnPrices.find(element => _.isEqual(element.hsCode, worksheet.getCell(`J`).value) && _.isEqual(element.country, worksheet.getCell(`L`).value));
+                  let found = grnPrices.find(element => _.isEqual(element.hsCode, worksheet.getCell(`J${row}`).value) && _.isEqual(element.country, worksheet.getCell(`L${row}`).value));
                   if (!_.isUndefined(found)) {
-                    found.totalPrice += (Number(worksheet.getCell(`H${row}`).value) || 0);
+                    found.totalPrice += (Number(worksheet.getCell(`I${row}`).value) || 0);
                   } else {
                     grnPrices.push({
                       hsCode: worksheet.getCell(`J${row}`).value,
                       country: worksheet.getCell(`L${row}`).value,
-                      totalPrice: worksheet.getCell(`H${row}`).value,
+                      totalPrice: worksheet.getCell(`I${row}`).value,
                     });
                   }
                 }
