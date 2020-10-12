@@ -28,9 +28,6 @@ router.post('/', (req, res) => {
                     poNrs: "",
                     invNrs: "",
                     boeDate: boeDate,
-                    // exRate: exRate || 1,
-                    // insurance: insurance || 0,
-                    // freight: freight || 0,
                     pcs: 0,
                     mtr: 0,
                     totalNetWeight: totalNetWeight,
@@ -43,7 +40,7 @@ router.post('/', (req, res) => {
                 });
 
                 newDocument.save()
-                .then( () => res.status(200).json({message: 'The document whas successfuly created.'}))
+                .then(doc => res.status(200).json({documentId: doc._id}))
                 .catch( (err) => {
                     console.log(err)
                     res.status(400).json({ message: 'The document could not be created.' })
