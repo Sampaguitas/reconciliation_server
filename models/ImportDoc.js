@@ -31,18 +31,18 @@ const ImportDocSchema = new Schema({
         type: Date,
         required: true
     },//-------------------------
-    exRate: {
-        type: Number,
-        required: true
-    },
-    isInsurance: {
-        type: Boolean,
-        default: false
-    },
-    freight: {
-        type: Number,
-        required: true
-    },
+    // exRate: {
+    //     type: Number,
+    //     required: true
+    // },
+    // isInsurance: {
+    //     type: Boolean,
+    //     default: false
+    // },
+    // freight: {
+    //     type: Number,
+    //     required: true
+    // },//-------------------------
     pcs: {
         type: Number,
         default: 0,

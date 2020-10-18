@@ -16,6 +16,7 @@ let headers = [
     { number: 'J', value: 'HS Code' },
     { number: 'K', value: 'HS Desc' },
     { number: 'L', value: 'Country' },
+    { number: 'M', value: 'CIF Value (AED)' },
 ];
 
 router.get('/', function (req, res) {
