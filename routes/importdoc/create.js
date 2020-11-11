@@ -4,11 +4,11 @@ const ImportDoc = require('../../models/ImportDoc');
 
 router.post('/', (req, res) => {
 
-    const { decNr, boeNr, sfiNr, boeDate, totalNetWeight, totalGrossWeight } = req.body;
+    const { decNr, boeNr, sfiNr, boeDate } = req.body;
     let regDec = /^\d{3}-\d{8}-\d{2}$/;
     let regBoe = /^\d{12}$/;
     
-    if (!decNr || !boeNr || !boeDate || !totalNetWeight || !totalGrossWeight) {
+    if (!decNr || !boeNr || !boeDate) {
         return res.status(400).json({ message: 'DEC, BOE, Date, Net and Gross Weight are required.'});
     } else if (!regDec.test(decNr)) {
         return res.status(400).json({ message: 'Wrong DEC format.'});
@@ -30,8 +30,8 @@ router.post('/', (req, res) => {
                     boeDate: boeDate,
                     pcs: 0,
                     mtr: 0,
-                    totalNetWeight: totalNetWeight,
-                    totalGrossWeight: totalGrossWeight,
+                    totalNetWeight: 0,
+                    totalGrossWeight: 0,
                     totalPrice: 0,
                     summary: [],
                     assignedPcs: 0,
