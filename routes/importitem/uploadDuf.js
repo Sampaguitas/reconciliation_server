@@ -21,8 +21,11 @@ let headers = [
   { number: 'I', key: 'totalPrice', value: 'Total Price', type: 'number' },
   { number: 'J', key: 'hsCode', value: 'HS Code', type: 'text' },
   { number: 'K', key: 'hsDesc', value: 'HS Desc', type: 'text' },
-  { number: 'L', key: 'country', value: 'Country', type: 'text' },
-  { number: 'M', key: 'cifValue', value: 'CIF Value', type: 'number' },
+  { number: 'L', key: 'country', value: 'HS Country', type: 'text' },
+  { number: 'M', key: 'hsValue', value: 'HS Value', type: 'number' },
+  { number: 'N', key: 'hsNetWeight', value: 'HS Net Weight', type: 'number' },
+  { number: 'O', key: 'hsGrossWeight', value: 'HS Gross Weight', type: 'number' },
+  
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
@@ -75,34 +78,26 @@ router.post('/', upload.single('file'), function (req, res) {
                   nAdded: nAdded,
                 });
               } else {
-                let grnWeight = 0
-                let grnPrices = [];
+                let grnValues = [];
                 
                 for (let row = 2; row < rowCount + 1 ; row++) {
-                  grnWeight += (Number(worksheet.getCell(`H${row}`).value) || 0);
-                  let found = grnPrices.find(element => _.isEqual(element.hsCode, worksheet.getCell(`J${row}`).value) && _.isEqual(element.country, worksheet.getCell(`L${row}`).value));
+                  let found = grnValues.find(element => _.isEqual(element.hsCode, worksheet.getCell(`J${row}`).value) && _.isEqual(element.country, worksheet.getCell(`L${row}`).value));
                   if (!_.isUndefined(found)) {
                     found.totalPrice += (Number(worksheet.getCell(`I${row}`).value) || 0);
+                    found.totalNetWeight += (Number(worksheet.getCell(`H${row}`).value) || 0);
                   } else {
-                    grnPrices.push({
+                    grnValues.push({
                       hsCode: worksheet.getCell(`J${row}`).value,
                       country: worksheet.getCell(`L${row}`).value,
                       totalPrice: worksheet.getCell(`I${row}`).value,
+                      totalNetWeight: worksheet.getCell(`H${row}`).value,
                     });
                   }
                 }
                 
-                if (!grnWeight || !importdoc.totalNetWeight || !importdoc.totalGrossWeight) {
+                if (_.isEmpty(grnValues)) { //|| !importdoc.exRate
                   return res.status(400).json({
-                    message: 'GRN Net Weight, ImportDoc Net Wight and ImportDoc Gross Weight should not be null',
-                    rejections: rejections,
-                    nProcessed: nProcessed,
-                    nRejected: nRejected,
-                    nAdded: nAdded,
-                  });
-                } else if (_.isEmpty(grnPrices)) { //|| !importdoc.exRate
-                  return res.status(400).json({
-                    message: 'GRN Total Price should not be null',
+                    message: 'Total Price and Net Weight should not be null',
                     rejections: rejections,
                     nProcessed: nProcessed,
                     nRejected: nRejected,
@@ -137,7 +132,7 @@ router.post('/', upload.single('file'), function (req, res) {
                       });
       
                       await Promise.all(colPromises).then( async () => {
-                        rowPromises.push(upsert(documentId, row, tempItem, grnWeight, importdoc.totalNetWeight, importdoc.totalGrossWeight, grnPrices)); //importdoc.exRate || 1, importdoc.insurance || 0, importdoc.freight || 0
+                        rowPromises.push(upsert(documentId, row, tempItem, grnValues)); //importdoc.exRate || 1, importdoc.insurance || 0, importdoc.freight || 0
                       }).catch(errPromises => {
                         if(!_.isEmpty(errPromises)) {
                           rejections.push(errPromises);
@@ -188,7 +183,7 @@ router.post('/', upload.single('file'), function (req, res) {
         });
   });
 
-  function upsert(documentId, row, tempItem, grnWeight, docNetWeight, docGrossWeight, grnPrices) { //docExRate, docInsurance, docFreight
+  function upsert(documentId, row, tempItem, grnValues) { //docExRate, docInsurance, docFreight
     return new Promise (function (resolve) {
       if (!tempItem.srNr) {
         resolve({
@@ -256,22 +251,34 @@ router.post('/', upload.single('file'), function (req, res) {
           isRejected: true,
           reason: 'Country should not be empty.'
         });
-      } else if (!tempItem.cifValue) {
+      } else if (!tempItem.hsValue) {
         resolve({
           row: row,
           isRejected: true,
-          reason: 'CIF Value should not be empty.'
+          reason: 'HS Value should not be empty.'
+        });
+      } else if (!tempItem.hsNetWeight) {
+        resolve({
+          row: row,
+          isRejected: true,
+          reason: 'HS Net Weight should not be empty.'
+        });
+      } else if (!tempItem.hsGrossWeight) {
+        resolve({
+          row: row,
+          isRejected: true,
+          reason: 'HS Gross Weight should not be empty.'
         });
       } else {
-        let grnPrice = grnPrices.find(element => _.isEqual(element.hsCode, tempItem.hsCode) && _.isEqual(element.country, tempItem.country));
-        if (_.isUndefined(grnPrice)) {
+        let grnValue = grnValues.find(element => _.isEqual(element.hsCode, tempItem.hsCode) && _.isEqual(element.country, tempItem.country));
+        if (_.isUndefined(grnValue)) {
           resolve({
             row: row,
             isRejected: true,
-            reason: 'Could not retreive GRN Price.'
+            reason: 'Could not retreive GRN Price or Net Weight.'
           });
         } else {
-          let totalPrice = tempItem.cifValue * (tempItem.totalPrice / grnPrice.totalPrice)
+          let totalPrice = tempItem.hsValue * (tempItem.totalPrice / grnValue.totalPrice)
 
           let newItem = new ImportItem({
             srNr: tempItem.srNr,
@@ -281,10 +288,10 @@ router.post('/', upload.single('file'), function (req, res) {
             desc: tempItem.desc,
             pcs: tempItem.pcs,
             mtr: tempItem.mtr || 0,
-            unitNetWeight: ( ( (tempItem.totalNetWeight / grnWeight) * docNetWeight ) / tempItem.pcs) || 0,
-            totalNetWeight: ( (tempItem.totalNetWeight / grnWeight) * docNetWeight ),
-            unitGrossWeight: ( ( (tempItem.totalNetWeight / grnWeight) * docGrossWeight ) / tempItem.pcs) || 0,
-            totalGrossWeight: ( (tempItem.totalNetWeight / grnWeight) * docGrossWeight ),
+            unitNetWeight: ( ( hsNetWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight) ) / tempItem.pcs) || 0,
+            totalNetWeight: hsNetWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight),
+            unitGrossWeight: ( ( hsGrossWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight) ) / tempItem.pcs) || 0,
+            totalGrossWeight: hsGrossWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight),
             unitPrice: totalPrice / tempItem.pcs || 0,
             totalPrice: totalPrice,
             hsCode: tempItem.hsCode,

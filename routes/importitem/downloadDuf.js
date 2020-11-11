@@ -15,8 +15,10 @@ let headers = [
     { number: 'I', value: 'Total Price (GRN)' },
     { number: 'J', value: 'HS Code' },
     { number: 'K', value: 'HS Desc' },
-    { number: 'L', value: 'Country' },
-    { number: 'M', value: 'CIF Value (AED)' },
+    { number: 'L', value: 'HS Country' },
+    { number: 'M', value: 'HS Value' },
+    { number: 'N', value: 'HS Net Weight' },
+    { number: 'O', value: 'HS Gross Weight' },
 ];
 
 router.get('/', function (req, res) {
@@ -32,17 +34,6 @@ router.get('/', function (req, res) {
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc'}
             }
-            // font = {
-            //     name: 'Calibri',
-            //     color: { argb: 'FFFFFF'},
-            //     family: 2,
-            //     size: 11,
-            //     bold: true
-            // },
-            // alignment = {
-            //     vertical: 'middle',
-            //     horizontal: 'left'
-            // }
         }
     });
     workbook.xlsx.write(res);
