@@ -60,7 +60,7 @@ router.get('/', function (req, res) {
                     invAlignment.map(address => invSheet.getCell(address).alignment = { wrapText: false });
                     delAlignment.map(address => delSheet.getCell(address).alignment = { wrapText: false });
                     sumAlignment.map(address => sumSheet.getCell(address).alignment = { wrapText: false });
-                    let exportitems = exportdoc.items.reduce(function(acc, exportitem) {
+                    let exportitems = exportdoc.items.sort((a, b) => a.srNr-b.srNr).reduce(function(acc, exportitem) {
                             exportitem.transactions.map(transaction => {
                                 let number = `${transaction.importitem.importdoc.decNr} ${transaction.importitem.importdoc.boeNr}`
                                 acc.lines.push({
@@ -68,12 +68,12 @@ router.get('/', function (req, res) {
                                     'B': number,
                                     'C': transaction.importitem.poNr,
                                     'E': transaction.importitem.srNr,
-                                    'G': transaction.importitem.pcs,
+                                    'G': transaction.pcs,
                                     'H': transaction.importitem.desc,
                                     'I': transaction.importitem.hsCode,
                                     'J': transaction.importitem.country,
                                     'K': 'NEW',
-                                    'L': transaction.importitem.pcs,
+                                    'L': transaction.pcs,
                                     'M': 'PCS',
                                     'N': transaction.importitem.unitNetWeight * transaction.pcs,
                                     'O': transaction.importitem.unitGrossWeight * transaction.pcs,
