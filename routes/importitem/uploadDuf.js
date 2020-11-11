@@ -29,7 +29,7 @@ let headers = [
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
-  
+
   const documentId = req.body.documentId;
   const file = req.file;
 
@@ -279,7 +279,6 @@ router.post('/', upload.single('file'), function (req, res) {
           });
         } else {
           let totalPrice = tempItem.hsValue * (tempItem.totalPrice / grnValue.totalPrice)
-
           let newItem = new ImportItem({
             srNr: tempItem.srNr,
             invNr: tempItem.invNr,
@@ -288,10 +287,10 @@ router.post('/', upload.single('file'), function (req, res) {
             desc: tempItem.desc,
             pcs: tempItem.pcs,
             mtr: tempItem.mtr || 0,
-            unitNetWeight: ( ( hsNetWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight) ) / tempItem.pcs) || 0,
-            totalNetWeight: hsNetWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight),
-            unitGrossWeight: ( ( hsGrossWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight) ) / tempItem.pcs) || 0,
-            totalGrossWeight: hsGrossWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight),
+            unitNetWeight: ( ( tempItem.hsNetWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight) ) / tempItem.pcs) || 0,
+            totalNetWeight: tempItem.hsNetWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight),
+            unitGrossWeight: ( ( tempItem.hsGrossWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight) ) / tempItem.pcs) || 0,
+            totalGrossWeight: tempItem.hsGrossWeight * (tempItem.totalNetWeight / grnValue.totalNetWeight),
             unitPrice: totalPrice / tempItem.pcs || 0,
             totalPrice: totalPrice,
             hsCode: tempItem.hsCode,
@@ -302,6 +301,7 @@ router.post('/', upload.single('file'), function (req, res) {
             assignedMtr: 0,
             isClosed: false,
           });
+          
 
           newItem.save()
           .then( () => {
