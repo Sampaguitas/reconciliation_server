@@ -25,7 +25,6 @@ let headers = [
   { number: 'M', key: 'hsValue', value: 'HS Value', type: 'number' },
   { number: 'N', key: 'hsNetWeight', value: 'HS Net Weight', type: 'number' },
   { number: 'O', key: 'hsGrossWeight', value: 'HS Gross Weight', type: 'number' },
-  
 ];
 
 router.post('/', upload.single('file'), function (req, res) {
