@@ -11,6 +11,7 @@ const ImportItem = require('../../models/ImportItem');
 
 let headers = [
   { number: 'A', key: 'srNr', value: 'SrNo', type: 'number' },
+  { number: 'B', key: 'BatchNr', value: 'Batch Nr', type: 'number' },
   { number: 'C', key: 'invNr', value: 'Inv Nr', type: 'text' },
   { number: 'D', key: 'poNr', value: 'PO Nr', type: 'text' },
   { number: 'E', key: 'artNr', value: 'Art Nr', type: 'text' },
@@ -80,16 +81,16 @@ router.post('/', upload.single('file'), function (req, res) {
                 let grnValues = [];
                 
                 for (let row = 2; row < rowCount + 1 ; row++) {
-                  let found = grnValues.find(element => _.isEqual(element.hsCode, worksheet.getCell(`J${row}`).value) && _.isEqual(element.country, worksheet.getCell(`L${row}`).value));
+                  let found = grnValues.find(element => _.isEqual(element.hsCode, worksheet.getCell(`K${row}`).value) && _.isEqual(element.country, worksheet.getCell(`M${row}`).value));
                   if (!_.isUndefined(found)) {
-                    found.totalPrice += (Number(worksheet.getCell(`I${row}`).value) || 0);
-                    found.totalNetWeight += (Number(worksheet.getCell(`H${row}`).value) || 0);
+                    found.totalPrice += (Number(worksheet.getCell(`J${row}`).value) || 0);
+                    found.totalNetWeight += (Number(worksheet.getCell(`I${row}`).value) || 0);
                   } else {
                     grnValues.push({
-                      hsCode: worksheet.getCell(`J${row}`).value,
-                      country: worksheet.getCell(`L${row}`).value,
-                      totalPrice: worksheet.getCell(`I${row}`).value,
-                      totalNetWeight: worksheet.getCell(`H${row}`).value,
+                      hsCode: worksheet.getCell(`K${row}`).value,
+                      country: worksheet.getCell(`M${row}`).value,
+                      totalPrice: worksheet.getCell(`J${row}`).value,
+                      totalNetWeight: worksheet.getCell(`I${row}`).value,
                     });
                   }
                 }
