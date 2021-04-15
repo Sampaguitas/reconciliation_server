@@ -71,8 +71,10 @@ TransactionSchema.post(['save', 'findOneAndUpdate', 'findOneAndDelete'], functio
             let totals = resTransactions.reduce(function(acc, cur) {
                 acc.assignedPcs += cur.pcs;
                 acc.assignedMtr += cur.mtr;
-                acc.totalNetWeight += cur.importitem.totalNetWeight;
-                acc.totalGrossWeight += cur.importitem.totalGrossWeight;
+                // acc.totalNetWeight += cur.importitem.totalNetWeight;
+                // acc.totalGrossWeight += cur.importitem.totalGrossWeight;
+                acc.totalNetWeight +=  (cur.pcs * cur.importitem.unitNetWeight);
+                acc.totalGrossWeight += (cur.pcs * cur.importitem.unitGrossWeight);
                 if (!acc.isClosed && acc.assignedPcs >= cur.exportitem.pcs && acc.assignedMtr >= cur.exportitem.mtr) {
                     acc.isClosed = true
                 }
