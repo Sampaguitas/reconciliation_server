@@ -78,7 +78,7 @@ router.post('/', (req, res) => {
             }
         ])
         .sort({
-            [!!sort.name ? sort.name : 'decNr']: sort.isAscending === false ? -1 : 1
+            [!sort.name ? "boeDate" : sort.name]: !sort.name ? -1 : sort.isAscending === false ? -1 : 1
         })
         .exec(function (err, importDocs) {
             if (err) {
